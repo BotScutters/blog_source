@@ -9,7 +9,7 @@ CONFFILE=$(BASEDIR)/pelicanconf.py
 PUBLISHCONF=$(BASEDIR)/publishconf.py
 
 FTP_HOST=localhost
-FTP_USER=cliffclive
+FTP_USER=scbutters
 FTP_TARGET_DIR=/
 
 SSH_HOST=localhost
