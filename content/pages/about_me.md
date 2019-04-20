@@ -6,8 +6,8 @@ slug: about-me
 summary: Scott Butters - orbiting about the singularity
 status: published
 
-![me]({static}/img/via_ferrata.jpg)
+<img src="{static}/img/via_ferrata.jpg" alt="me" width="400"/>
 
 ## About Me
 
-I'm Scott Butters.  
+I'm Scott Butters. Data scientist and engineer, versed in python, robots, and the impending singularity.
