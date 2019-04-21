@@ -282,19 +282,51 @@ Bits 'n' Bots            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>In 2012, Washington state passed I-502 and legalized the recreational sale, use, and possession of marijuana. This event has led to an explosion of development in the field that's making waves through our society. Since 2014, approximately 500 state licensed dispensaries have opened throughout the state, with nearly 150 of those here in Seattle. In this project I scour the web for publicly available data that might be predictive of how a cannabis dispensary performs, such as customer reviews, inventory distributions, and local demographics. I then train machine learning models to predict a dispensary's monthly revenue and analyze the resulting models to distill insights about what drives sales in the marijuana market.</p>
+                <p>Marijuana is a controversial subject, to be sure. That said, as Washington state and others have legalized recreational pot over the past handful of years the industry has gone from being confined to the shadows to operating on full display in showrooms reminiscent of Apple stores and luxury car dealerships. </p>
+<p><img src="/img/budtender-1024x640.jpg" alt="me"/></p>
+<p>For the last two weeks, I've been immersed in a cloud of data surrounding the Washington marijuana industry, attempting to model the relationship between factors like online reviews and local demographics and a dispensary's reported revenue. While it's been a bit hazy at times, it's ultimately led to some enlightening insights. I'd love to share with you some of what I've learned while dabbling with Mary Jane, the model. </p>
+<h2>Abstract</h2>
+<p>In 2012, Washington state passed I-502 and legalized the recreational sale, use, and possession of marijuana. This has led to  an explosion of development in the field that's making waves through our society. Since 2014, approximately 500 state licensed dispensaries have opened throughout the state, with nearly 150 of those here in Seattle. In this project, I scoured the web for publicly available data that might be predictive of how a cannabis dispensary performs, such as customer reviews, inventory distributions, and local demographics. I then trained machine learning models to predict a dispensary's monthly revenue and analyze the resulting models to distill insights about what drives sales in the marijuana market. For the full source code from my project, check out <a href="https://github.com/BotScutters/dispensary-predictions">my GitHub</a>.</p>
 <h2>Tools</h2>
+<p><strong>Code</strong></p>
 <ul>
 <li>Python</li>
+<li>Jupyter notebook</li>
+</ul>
+<p><strong>Data exploration and cleaning</strong></p>
+<ul>
 <li>Numpy</li>
 <li>Pandas</li>
-<li>Sklearn</li>
-<li>Matplotlib</li>
-<li>Seaborn</li>
-<li>Selenium</li>
 <li>Fuzzywuzzy</li>
 </ul>
+<p><strong>Modeling</strong>:</p>
+<ul>
+<li>Sklearn</li>
+</ul>
+<p><strong>Visualization</strong>:</p>
+<ul>
+<li>Matplotlib</li>
+<li>Seaborn</li>
+</ul>
+<p><strong>Web scraping</strong></p>
+<ul>
+<li>Requests</li>
+<li>Selenium</li>
+</ul>
+<p><strong>Workflow management</strong></p>
+<ul>
+<li>DataScienceMVP</li>
+<li>Cookiecutter</li>
+</ul>
 <h2>Data Sources</h2>
+<ul>
+<li>Washington State Liquor and Cannabis Board (WSLCB)</li>
+<li>Leafly</li>
+<li>WA HomeTownLocator</li>
+<li>Walkscore</li>
+</ul>
+<h3>Licensing and Sales Data from <a href="https://lcb.wa.gov/">WSLCB</a></h3>
+<p>Lastly, all that data would get us nowhere if we didn't have any target data to train our models on. That's where the WSLCB comes in. The WSLCB maintains data on every dispensary in the state, including monthly reports of revenue (which is what our model is predicting). Their data is scattered across a couple of different outlets, but for this project I used spreadsheets downloadable from <a href="https://lcb.wa.gov/records/frequently-requested-lists">this obsure page</a> to get sales data dating back to November 2017. Because the only identifying information in that spreadsheet is the license number of the dispensary, I also downloaded a spreadsheet listing metadata for every entity that has applied for a Marijuana license, which I then joined with the sales data in order to link it up with data scraped from other resources.</p>
 <h3>Dispensary profiles from <a href="www.leafly.com">Leafly</a></h3>
 <p>Leafly is an information aggregator for cannabis. They maintain a profile for most of the dispensaries in the state. As part of my dataset, I've scraped the following features from the Leafly website for each dispensary for which it was available:</p>
 <ul>
@@ -314,13 +346,29 @@ Bits 'n' Bots            </a>
 <p>These data give our model an image of what a dispensary's customer base is like, allowing us to characterize what makes for a good location to establish a dispensary.</p>
 <h3><a href="www.walkscore.com">Walkscore</a></h3>
 <p>I also used the Walkscore API to query their database for scores on how easily consumers can reach each dispensary by foot or bike.</p>
-<h3><a href="https://lcb.wa.gov/">Washington State Liquor and Cannabis Board (WSLCB)</a></h3>
-<p>Lastly, all that data would get us nowhere if we didn't have any target data to train our models on. That's where the WSLCB comes in. The WSLCB maintains data on every dispensary in the state, including monthly reports of revenue (which is what our model is predicting). Their data is scattered across a couple of different outlets, but for this project I used spreadsheets downloadable from <a href="https://lcb.wa.gov/records/frequently-requested-lists">this obsure page</a> to get sales data dating back to November 2017. Because the only identifying information in that spreadsheet is the license number of the dispensary, I also downloaded a spreadsheet listing metadata for every entity that has applied for a Marijuana license, which I then joined with the sales data in order to link it up with data scraped from other resources.</p>
-<h2>Methods</h2>
-<h2>Model</h2>
-<h2>Challenges</h2>
-<h2>Insights</h2>
+<h2>Obtaining the Data</h2>
+<h3>Scraping Leafly</h3>
+<h3>Scraping demographic data</h3>
+<h2>Cleaning, Combining, and Developing the Data</h2>
+<h3>Merging data without a common key</h3>
+<h3>Determining dispensary density</h3>
+<h2>Explore, Engineer, and Iterate</h2>
+<h3>Heatmap of correlations</h3>
+<h3>Regression plots of each feature with target variable</h3>
+<h2>Building and Refining a Model</h2>
+<h3>Building an MVP (Minimum Viable Product) with multivariate linear regression</h3>
+<h3>Optimizing our model and feature selection with feature scaling and regularization through lasso regression</h3>
+<h2>So What Insights Can We Glean?</h2>
+<h3>Descaling and translating our coefficients into terms we can understand</h3>
 <h2>Future Work</h2>
+<ul>
+<li>Collect more data</li>
+<li>More extensive exploratory data analysis</li>
+<li>Time series projections</li>
+<li>Look at revenue <em>growth</em> as a target variable</li>
+<li>Experiment with different models</li>
+<li>Suggest optimal locations and product lines</li>
+</ul>
             </div>
             <!-- /.entry-content -->
         </article>
