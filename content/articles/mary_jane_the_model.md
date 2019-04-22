@@ -170,6 +170,11 @@ It seemed plausible to me that I could leverage [Walkscore](https://www.walkscor
 
 ### Heatmap of correlations
 
+<figure align="middle">
+  <img src="{static}/img/heatmap.png" alt="heatmap" style="width:100%">
+  <figcaption>Correlation map of a selection of features and the target variable</figcaption>
+</figure>
+
 ###Regression plots of each feature with target variable
 
 ## Building and Refining a Model
@@ -218,15 +223,46 @@ This is the point where I entered the iterative phase, which basically meant liv
 To do this, I wrote a pipeline function to perform the following steps:
 
 1. Import processed data into a Pandas dataframe
-2. Split the dataframe ("randomly") into a training set containing 80% of the observations and a test set containing the other 20%.
-3. Stash the 20% test set far far away where my model couldn't see it.
-4. Instantiate a regression model through sci-kits learn. I used:
+2. Scale each feature by subtracting off its mean value and dividing it by its standard deviation.
+3. Split the dataframe ("randomly") into a training set containing 80% of the observations and a test set containing the other 20%.
+4. Stash the 20% test set far far away where my model couldn't see it.
+5. Instantiate a regression model through sci-kits learn. I used:
    * Linear regression
    * Ridge regression (with alpha parameter)
    * Lasso regression (with alpha parameter)
-5. Perform a 5-way cross validation split on the training data (so splitting it further into 5 groups, each containing 80/20 split of the 80% training set.
-6. Train the model on each cross-validation training set, then compute error metrics using the cv test sets.
-7. Take the average error over the set of 5 runs and log that in a report to be referenced later when comparing models.
+6. Perform a 5-way cross validation split on the training data (so splitting it further into 5 groups, each containing 80/20 split of the 80% training set.
+7. Train the model on each cross-validation training set, then compute error metrics using the cv test sets.
+8. Take the average error over the set of 5 runs and log that in a report to be referenced later when comparing models.
+
+With that framework in place, I proceeded to subject my data to a battery of experimental models. Because I knew that I have way too many features for such limited data, I decided to try out ridge and lasso regression regularization methods as their cost functions are effective for reducing feature count and suppressing multicollinearity, which I certainly had plenty of. 
+
+Though sklearn has functions in place (RidgeCV and LassoCV) that automatically optimize the penalty hyperparameter ${\lambda}$ (or $\alpha$ within sklearn) through cross validation, I decided to recode the process by hand. Because like they say, reinventing the wheel is the best way to know your way around it. I mean, I bet *somebody's* set that before.
+
+So I set up a for loop to iteratively run models on the data while tweaking the value for $\lambda$ on a logarithmic scale until I'd identified the range of values that tended to minimize the mean squared error of the model when run on the test data. From there I modified my range and zoomed in until I'd identified values that seemed "optimal enough" (90.658 for ridge regression and 0.0172 for lasso). It was time to make a choice. The results of final runs with each model are copied below.
+
+| Model            | Rows | Cols | Target          | Train R^2 | Test R^2 | MSE    | RMSE   |
+| ---------------- | ---- | ---- | --------------- | --------- | -------- | ------ | ------ |
+| Ridge regression | 291  | 67   | log_total_sales | 0.5026    | 0.3439   | 0.0977 | 0.3126 |
+| Lasso regression | 291  | 67   | log_total_sales | 0.4676    | 0.3782   | 0.0931 | 0.3051 |
+
+Their performance was close, but ultimately I chose the lasso regression as my preferred model for this situation both because it performed better in terms of my error metrics an also because it has the effect of actually zeroing out the coefficients on underperforming features rather than just suppressing them to low values. This feature strikes me as just a touch better generalization and more easily interpretable, too.
+
+Final model selected, I went ahead and dug up my true test data from the vault and ran a final prediction on the as-yet-unseen test data.
+
+| Model                  | Rows | Cols | Target          | Train R^2 | Test R^2 | MSE    | RMSE   |
+| ---------------------- | ---- | ---- | --------------- | --------- | -------- | ------ | ------ |
+| Ridge regression       | 291  | 67   | log_total_sales | 0.5026    | 0.3439   | 0.0977 | 0.3126 |
+| Lasso regression       | 291  | 67   | log_total_sales | 0.4676    | 0.3782   | 0.0931 | 0.3051 |
+| Final lasso regression | 291  | 67   | log_total_sales | 0.4546    | 0.3781   | 0.1094 | 0.3307 |
+
+Slightly worse than our cross validated results, that's to be expected. While we've reached a model that is certainly more robust than our original regression, our performance is still lackluster. There's obviously plenty of room for improvement if this ever gets picked up again.
+
+
+
+<figure align="middle">
+  <img src="{static}/img/residuals.png" alt="residuals" style="width:80%">
+  <figcaption>Scatterplot of final model performance, where green is true values of test data observations, red is model predictions, and blue is the residuals (error) of each prediction.</figcaption>
+</figure>
 
 
 
@@ -234,7 +270,19 @@ To do this, I wrote a pipeline function to perform the following steps:
 
 ### Descaling and translating our coefficients into terms we can understand
 
-## Future Work
+| **Features**                   | **Scaled Coefficients** | **Unscaled Coefficients** |
+| :----------------------------- | ----------------------: | ------------------------: |
+| log_number_of_reviews          |              0.15479356 |                0.22254295 |
+| log_population_density         |              0.07910167 |                0.09257050 |
+| prerolls                       |              0.02178097 |                0.00023536 |
+| owner_occupied_housing_units_# |              0.01376879 |                0.00000379 |
+| all_products                   |              0.01267409 |                0.00002623 |
+| log_population_in_group_qrtrs  |              0.01068558 |                0.01412068 |
+| number_of_reviews              |              0.00977085 |                0.00007235 |
+| per_capita_income              |              0.00622086 |                0.00000056 |
+| misc                           |              0.00205136 |                0.00001326 |
+
+### Future Work
 
 * Collect more data
 * More extensive exploratory data analysis

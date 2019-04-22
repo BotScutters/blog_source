@@ -14,6 +14,17 @@ PATH = 'content'
 ARTICLE_PATHS = ['articles']
 PAGE_PATHS = ['pages']
 STATIC_PATHS = ['img', 'pdf']
+MARKDOWN = {
+    'extension_configs': {
+        'markdown.extensions.codehilite': {
+            'css_class': 'highlight',
+        },
+        'markdown.extensions.extra': {},
+        # optionally, more extensions,
+        # e.g. markdown.extensions.meta
+    },
+    'output_format': 'html5',
+}
 
 ARTICLE_URL = 'articles/{date:%Y}/{date:%m}/{date:%d}/{slug}/'
 ARTICLE_SAVE_AS = 'articles/{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'

@@ -405,6 +405,11 @@ Bits 'n' Bots            </a>
 <h3>Determining dispensary density</h3>
 <h2>Explore, Engineer, and Iterate</h2>
 <h3>Heatmap of correlations</h3>
+<figure align="middle">
+  <img src="/img/heatmap.png" alt="heatmap" style="width:100%">
+  <figcaption>Correlation map of a selection of features and the target variable</figcaption>
+</figure>
+
 <h3>Regression plots of each feature with target variable</h3>
 <h2>Building and Refining a Model</h2>
 <h3>Building an MVP (Minimum Viable Product) with multivariate linear regression</h3>
@@ -443,6 +448,7 @@ Bits 'n' Bots            </a>
 <p>To do this, I wrote a pipeline function to perform the following steps:</p>
 <ol>
 <li>Import processed data into a Pandas dataframe</li>
+<li>Scale each feature by subtracting off its mean value and dividing it by its standard deviation.</li>
 <li>Split the dataframe ("randomly") into a training set containing 80% of the observations and a test set containing the other 20%.</li>
 <li>Stash the 20% test set far far away where my model couldn't see it.</li>
 <li>Instantiate a regression model through sci-kits learn. I used:</li>
@@ -453,9 +459,158 @@ Bits 'n' Bots            </a>
 <li>Train the model on each cross-validation training set, then compute error metrics using the cv test sets.</li>
 <li>Take the average error over the set of 5 runs and log that in a report to be referenced later when comparing models.</li>
 </ol>
+<p>With that framework in place, I proceeded to subject my data to a battery of experimental models. Because I knew that I have way too many features for such limited data, I decided to try out ridge and lasso regression regularization methods as their cost functions are effective for reducing feature count and suppressing multicollinearity, which I certainly had plenty of. </p>
+<p>Though sklearn has functions in place (RidgeCV and LassoCV) that automatically optimize the penalty hyperparameter ${\lambda}$ (or $\alpha$ within sklearn) through cross validation, I decided to recode the process by hand. Because like they say, reinventing the wheel is the best way to know your way around it. I mean, I bet <em>somebody's</em> set that before.</p>
+<p>So I set up a for loop to iteratively run models on the data while tweaking the value for $\lambda$ on a logarithmic scale until I'd identified the range of values that tended to minimize the mean squared error of the model when run on the test data. From there I modified my range and zoomed in until I'd identified values that seemed "optimal enough" (90.658 for ridge regression and 0.0172 for lasso). It was time to make a choice. The results of final runs with each model are copied below.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Rows</th>
+<th>Cols</th>
+<th>Target</th>
+<th>Train R^2</th>
+<th>Test R^2</th>
+<th>MSE</th>
+<th>RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ridge regression</td>
+<td>291</td>
+<td>67</td>
+<td>log_total_sales</td>
+<td>0.5026</td>
+<td>0.3439</td>
+<td>0.0977</td>
+<td>0.3126</td>
+</tr>
+<tr>
+<td>Lasso regression</td>
+<td>291</td>
+<td>67</td>
+<td>log_total_sales</td>
+<td>0.4676</td>
+<td>0.3782</td>
+<td>0.0931</td>
+<td>0.3051</td>
+</tr>
+</tbody>
+</table>
+<p>Their performance was close, but ultimately I chose the lasso regression as my preferred model for this situation both because it performed better in terms of my error metrics an also because it has the effect of actually zeroing out the coefficients on underperforming features rather than just suppressing them to low values. This feature strikes me as just a touch better generalization and more easily interpretable, too.</p>
+<p>Final model selected, I went ahead and dug up my true test data from the vault and ran a final prediction on the as-yet-unseen test data.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Rows</th>
+<th>Cols</th>
+<th>Target</th>
+<th>Train R^2</th>
+<th>Test R^2</th>
+<th>MSE</th>
+<th>RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ridge regression</td>
+<td>291</td>
+<td>67</td>
+<td>log_total_sales</td>
+<td>0.5026</td>
+<td>0.3439</td>
+<td>0.0977</td>
+<td>0.3126</td>
+</tr>
+<tr>
+<td>Lasso regression</td>
+<td>291</td>
+<td>67</td>
+<td>log_total_sales</td>
+<td>0.4676</td>
+<td>0.3782</td>
+<td>0.0931</td>
+<td>0.3051</td>
+</tr>
+<tr>
+<td>Final lasso regression</td>
+<td>291</td>
+<td>67</td>
+<td>log_total_sales</td>
+<td>0.4546</td>
+<td>0.3781</td>
+<td>0.1094</td>
+<td>0.3307</td>
+</tr>
+</tbody>
+</table>
+<p>Slightly worse than our cross validated results, that's to be expected. While we've reached a model that is certainly more robust than our original regression, our performance is still lackluster. There's obviously plenty of room for improvement if this ever gets picked up again.</p>
+<figure align="middle">
+  <img src="/img/residuals.png" alt="residuals" style="width:80%">
+  <figcaption>Scatterplot of final model performance, where green is true values of test data observations, red is model predictions, and blue is the residuals (error) of each prediction.</figcaption>
+</figure>
+
 <h2>So What Insights Can We Glean?</h2>
 <h3>Descaling and translating our coefficients into terms we can understand</h3>
-<h2>Future Work</h2>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>Features</strong></th>
+<th align="right"><strong>Scaled Coefficients</strong></th>
+<th align="right"><strong>Unscaled Coefficients</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">log_number_of_reviews</td>
+<td align="right">0.15479356</td>
+<td align="right">0.22254295</td>
+</tr>
+<tr>
+<td align="left">log_population_density</td>
+<td align="right">0.07910167</td>
+<td align="right">0.09257050</td>
+</tr>
+<tr>
+<td align="left">prerolls</td>
+<td align="right">0.02178097</td>
+<td align="right">0.00023536</td>
+</tr>
+<tr>
+<td align="left">owner_occupied_housing_units_#</td>
+<td align="right">0.01376879</td>
+<td align="right">0.00000379</td>
+</tr>
+<tr>
+<td align="left">all_products</td>
+<td align="right">0.01267409</td>
+<td align="right">0.00002623</td>
+</tr>
+<tr>
+<td align="left">log_population_in_group_qrtrs</td>
+<td align="right">0.01068558</td>
+<td align="right">0.01412068</td>
+</tr>
+<tr>
+<td align="left">number_of_reviews</td>
+<td align="right">0.00977085</td>
+<td align="right">0.00007235</td>
+</tr>
+<tr>
+<td align="left">per_capita_income</td>
+<td align="right">0.00622086</td>
+<td align="right">0.00000056</td>
+</tr>
+<tr>
+<td align="left">misc</td>
+<td align="right">0.00205136</td>
+<td align="right">0.00001326</td>
+</tr>
+</tbody>
+</table>
+<h3>Future Work</h3>
 <ul>
 <li>Collect more data</li>
 <li>More extensive exploratory data analysis</li>
