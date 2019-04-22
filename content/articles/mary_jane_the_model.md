@@ -177,7 +177,11 @@ It seemed plausible to me that I could leverage [Walkscore](https://www.walkscor
 
 ###Regression plots of each feature with target variable
 
+
+
 ## Building and Refining a Model
+
+
 
 ### Building an MVP (Minimum Viable Product) with multivariate linear regression
 
@@ -215,6 +219,28 @@ From there I generated an 80/20 train/test split (with a fixed random seed for r
 </figure>
 
 At this point I could only loosely argue that my model was performing better than if had simply predicted the mean dispensary revenue every time. Plenty of room to improve!
+
+### Feature Engineering
+
+Oh, where to start...
+
+One of the primary modes of feature engineering that I focused on in attempting to improve my model was feature transformations. These are cases where I could tell by looking at a plot of a feature vs the target variable that there was in fact a relationship there, but that it wasn't simply linear.
+
+
+
+<figure align="middle">
+  <img src="{static}/img/rel_plots.png" alt="rel-plots" style="width:100%">
+  <figcaption>Scatterplots showing selected features relative to both log- and non-log-transformed target variable.</figcaption>
+</figure>
+
+
+
+<figure align="middle">
+  <img src="{static}/img/log_transforms.png" alt="log-transforms" style="width:100%">
+  <figcaption>Scatterplots showing selected log-transformed features relative to both log- and non-log-transformed target variable.</figcaption>
+</figure>
+
+
 
 ### Optimizing our model and feature selection with feature scaling and regularization through lasso regression
 
@@ -268,7 +294,11 @@ Slightly worse than our cross validated results, that's to be expected. While we
 
 ## So What Insights Can We Glean?
 
+misc, number_of_reviews, population_in_group_qrtrs, population_density
+
 ### Descaling and translating our coefficients into terms we can understand
+
+
 
 | **Features**                   | **Scaled Coefficients** | **Unscaled Coefficients** |
 | :----------------------------- | ----------------------: | ------------------------: |
