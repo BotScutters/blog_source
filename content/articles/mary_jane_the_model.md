@@ -97,7 +97,7 @@ The methods for acquiring the data for this project really varied significantly 
 
 ### WSLCB License and Sales Data
 
-Other than actually finding this data, this was arguably the easiest piece of data to acquire for this project. If you go down the path of searching for dispensary sales data in the obvious place, which is on the state's [Marijuana Dashboard](<https://data.lcb.wa.gov/browse>), you'll be disappointed to discover that they basically stopped updating these stats on that page in 2017. No, it turns out that you instead need to go to the WSLCB's [Frequently Requested Lists](<https://lcb.wa.gov/records/frequently-requested-lists>) page, which hosts a variety of datasets related to marijuana in the state. Meandering path aside, it's now a matter of simply downloading two spreadsheets—one containing metadata for every marijuana license holder in the state (names, addresses, etc.) and the other containing monthly sales numbers for each license holder dating back to November 2017.
+Other than actually finding this data, this was arguably the easiest piece of data to acquire for this project. If you go down the path of searching for dispensary sales data in the obvious place (the state's [Marijuana Dashboard](<https://data.lcb.wa.gov/browse>), which hosts a bunch of cool interactive charting tools to browse the data the various data that's been collected related to the marijuana industry), you'll be disappointed to discover that they basically stopped updating these stats on that page in 2017. No, it turns out that you instead need to go to the WSLCB's [Frequently Requested Lists](<https://lcb.wa.gov/records/frequently-requested-lists>) page, which has download links to a hodge podge of datasets. Meandering path aside, it's now just a matter of simply downloading two spreadsheets—one containing metadata for every marijuana license holder in the state (names, addresses, etc.) and the other containing monthly sales numbers for each license holder dating back to November 2017. My code automatically searches the page for the latest versions and updates that into the training pipeline.
 
 ### Scraping Leafly
 
@@ -176,9 +176,59 @@ It seemed plausible to me that I could leverage [Walkscore](https://www.walkscor
 
 ### Building an MVP (Minimum Viable Product) with multivariate linear regression
 
-Once I had all my data and before 
+Once I had all my data combined and formatted into a [design matrix](<https://en.wikipedia.org/wiki/Design_matrix>), it was time to run my first linear regression and get an idea of my baseline model performance. Mind you, the purpose here is not yet to have a particularly *good* model, but simply to have established a simple, functioning pipeline that we can quickly and easily iterate on. 
+
+Of course, I couldn't simply allow myself to just throw *all* of my features into a linear regression model and call that good—at this point I was looking at 60 continuous variables, many of them highly covariant, and had just shy of 400 observations in my data. A ratio like that is a certain recipe for an unstable solutionspace that overfits every time, and I wouldn't wish it even on the model of my worst enemy. So I ran a quick 
+
+```python
+def get_top_corrs(df, n=15, target='total_sales'):
+    """
+    Given dataframe, return a list of the n features most strongly correlated 
+    with the target variable
+    Input: data in a Pandas dataframe, int for how many features desired
+    (default 15), string of column name representing target variable
+    Output: features, a list of strings representing the column names of just 
+    the top n features
+    """
+    numeric_corrs = df.select_dtypes(include=np.number).corr()
+    top_corrs = numeric_corrs.sort_values(by=target, ascending=False).head(n + 1)
+    features = list(top_corrs.drop(target, axis=1).columns)
+    return features
+
+data = get_processed_data()
+features = get_top_corrs(data)
+X, y = data[features], data['total_sales']
+```
+
+and voila! I had myself a dataframe containing only my 15 features most highly correlated with my target variable. Sure, 15 was an arbitrary choice that just felt a bit better than 60 and I knew there were all kinds of imperfections in the data…but this was something I could regress on with a bit less guilt.
+
+From there I generated an 80/20 train/test split (with a fixed random seed for repeatability, of course), fit a vanilla linear regression model on the X, y values from my training set and then used the model to predict the y values based on only the X from my training set. Unfortunately the precise results from my first run have been lost to the iterative ages, but if memory serves my initial training R^2 came out to about 0.3, with my test R^2 a bit closer to 0.2. I stuck the last few steps in a for-loop and iterated through 50 random seeds to generate a plot much like the following to show me how much it was varying just based on how the dataset was randomly split. Note that the plot below was actually generated after I had already started a bit of feature engineering.
+
+<figure align="middle">
+  <img src="{static}/img/mvp.png" alt="mvp" style="width:60%">
+  <figcaption>Scoring metrics from initial regression run prior to data processing and feature engineering</figcaption>
+</figure>
+
+At this point I could only loosely argue that my model was performing better than if had simply predicted the mean dispensary revenue every time. Plenty of room to improve!
 
 ### Optimizing our model and feature selection with feature scaling and regularization through lasso regression
+
+This is the point where I entered the iterative phase, which basically meant living in a feedback loop bouncing back and forth between model experimentation and feature engineering—until it didn't seem like I was going to get performance much better within the time constraints at hand. 
+
+To do this, I wrote a pipeline function to perform the following steps:
+
+1. Import processed data into a Pandas dataframe
+2. Split the dataframe ("randomly") into a training set containing 80% of the observations and a test set containing the other 20%.
+3. Stash the 20% test set far far away where my model couldn't see it.
+4. Instantiate a regression model through sci-kits learn. I used:
+   * Linear regression
+   * Ridge regression (with alpha parameter)
+   * Lasso regression (with alpha parameter)
+5. Perform a 5-way cross validation split on the training data (so splitting it further into 5 groups, each containing 80/20 split of the 80% training set.
+6. Train the model on each cross-validation training set, then compute error metrics using the cv test sets.
+7. Take the average error over the set of 5 runs and log that in a report to be referenced later when comparing models.
+
+
 
 ## So What Insights Can We Glean?
 
