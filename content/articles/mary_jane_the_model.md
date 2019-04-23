@@ -166,22 +166,81 @@ It seemed plausible to me that I could leverage [Walkscore](https://www.walkscor
 
 ### Determining dispensary density
 
-## Explore, Engineer, and Iterate
+## Exploration and Feature Engineering
+
+Some of my favorite tools for exploring relationships in data are built right in to the Seaborn plotting library. Let me walk through some quick examples of how I use jointplot, heatmap, and pairplots to identify trends in the data and give me clues on how I ought to transform my features.
+
+### A jointplot for each feature vs target variable combination
+
+Jointplots are a pretty slick wrapper on the JointGrid class where with just a quick switch of a parameter you can get a variety of plot types (scatter, regression, residual, kde or hex) that display a nice amount of information. For my initial explorations I used jointplot to display a scatterplot with univariate regression line for every feature compared to my target variable, target_sales, along with kernel density histograms for each variable. An example and the code to produce it are shown below:
+
+```python
+sns.jointplot(
+    x='number_of_reviews', 
+    y='total_sales', 
+    data=data, 
+    height=10,
+    ratio=4,
+    xlim=(-100, 1750),
+    ylim=(-10000, 1300000),
+    kind="reg",
+    joint_kws={'line_kws': {'color': 'r'},
+               'scatter_kws': {'alpha': 0.25}})
+```
+
+
+
+<figure align="middle">
+  <img src="{static}/img/jointplot.svg" alt="jointplot" style="width:80%">
+  <figcaption>Jointplot showing univariate regression on # of reviews vs total sales with kernel density histograms for each variable</figcaption>
+</figure>
+
+There's quite a bit we can learn from just a quick glance at this plot (and many others like it not produced here). For starters, that best fit line doesn't look like it fits very well. It seems we've got the majority of the data all scrunched up in the corner and a cloud of outliers fanning out in a rather thin fashion from there. A look at the histograms confirms that the data is quite skewed. Given that the variables we're working with are both counts that are bounded at 0, this is unsurprising. Fortunately, we've got tools to handle this sort of thing. I estimated that this feature (and many others) along with the target variable grow in an exponential fashion, meaning that I might be able to find some more linear relationships if I apply a log transform. Next step: create logarithmically transformed columns for every feature (and the target variable) exhibiting this trend. Check out the shift in this column once I applied that change:
+
+<figure align="middle">
+  <img src="{static}/img/log_jointplot.svg" alt="jointplot" style="width:80%">
+  <figcaption>Jointplot showing univariate regression on log(# of reviews) vs log(total sales) with kernel density histograms for each variable</figcaption>
+</figure>
+
+Is it a beautiful fit? Well, no, not exactly. The number_of_reviews feature is clearly a little bit broken, what with all those 0 values there. But I'd argue that our best fit line looks much more reasonable now than before, and our distributions are substantially closer to a Gaussian normal (which is definitely something we want). At this stage, I make a note to myself that maybe I can improve this feature more, but let's work with it as is for now.
 
 ### Heatmap of correlations
 
+So how about a different view of our data? I don't know about you, but I'm a big fan of heatmaps. Like I might be a little bit *too* into em. Ever since that time in college when I got really into darts and decided to track all of my throws to figure out my [accuracy/precision profile](<https://amloceanographic.com/wp-content/uploads/2017/08/Bullseye-Accuracy-vs-Precision-1024x602.jpg>) looked like… but I digress. What was I saying? Heatmaps! They're a fantastic way to check out two important qualities of your features: 
+
+1. Which ones are most correlated with your target variable?
+2. Which ones exhibit high multicollinearity with each other?
+
+Producing the following plot is fabulously simple (other than the particulars of formatting things prettily, which always manage to be a pain). But the basics are as follows.
+
+```python
+# Filter the df down to strictly continuous numeric variables
+numeric = data.select_dtypes(include=np.number)
+# Produce a correlation matrix sorted according to the target variable
+df = numeric[cols].corr().sort_values(by=target, ascending=False)
+# Heatmap! In shades of green, because context matters
+sns.heatmap(df, cmap='BuGn')
+```
+
+
+
 <figure align="middle">
-  <img src="{static}/img/heatmap.png" alt="heatmap" style="width:100%">
+  <img src="{static}/img/heatmap.svg" alt="heatmap" style="width:100%">
   <figcaption>Correlation map of a selection of features and the target variable</figcaption>
 </figure>
 
-###Regression plots of each feature with target variable
+And no, this isn't *all* of my features—but if you plot too many, rendering and interpretability becomes a real issue. But looking at just these, there's a few trends we can pick out:
 
+* The features (shown here) exhibiting the highest correlations with the log transform of total sales are the log transforms of the number of reviews, population density, and the number of dispensaries within 10 miles
+* There are several categories of features which exhibit moderately high multicollinearity. These tend to be clustered according to their data source. i.e. a dispensary with a large "All Products" count tends to also have large numbers of prerolls and flowers in stock. An area with high per capita income also has high median and average home values.
 
+These things aren't surprising, but they are important. We'll want to make sure to account for that multicollinearity later, as too much of it leads to not so great regressions, as the model can't decide which features to focus on.
 
 ## Building and Refining a Model
 
+I got a little bit a head of myself there, though. It's very tempting to run down the rabbit hole of feature engineering ad infinitum, but it's also important to just get your model working. So before I started transforming all my features, that's what I *actually* did. Let's step a few minutes back in time and walk through that process. I'm sorry, I really am, this iterative stuff just isn't terribly…linear.
 
+***five hours earlier***
 
 ### Building an MVP (Minimum Viable Product) with multivariate linear regression
 
@@ -209,7 +268,7 @@ features = get_top_corrs(data)
 X, y = data[features], data['total_sales']
 ```
 
-and voila! I had myself a dataframe containing only my 15 features most highly correlated with my target variable. Sure, 15 was an arbitrary choice that just felt a bit better than 60 and I knew there were all kinds of imperfections in the data…but this was something I could regress on with a bit less guilt.
+and Voila! I had myself a dataframe containing only my 15 features most highly correlated with my target variable. Sure, 15 was an arbitrary choice that just felt a bit better than 60 and I knew there were all kinds of imperfections in the data…but this was something I could regress on with a bit less guilt.
 
 From there I generated an 80/20 train/test split (with a fixed random seed for repeatability, of course), fit a vanilla linear regression model on the X, y values from my training set and then used the model to predict the y values based on only the X from my training set. Unfortunately the precise results from my first run have been lost to the iterative ages, but if memory serves my initial training R^2 came out to about 0.3, with my test R^2 a bit closer to 0.2. I stuck the last few steps in a for-loop and iterated through 50 random seeds to generate a plot much like the following to show me how much it was varying just based on how the dataset was randomly split. Note that the plot below was actually generated after I had already started a bit of feature engineering.
 
@@ -219,28 +278,6 @@ From there I generated an 80/20 train/test split (with a fixed random seed for r
 </figure>
 
 At this point I could only loosely argue that my model was performing better than if had simply predicted the mean dispensary revenue every time. Plenty of room to improve!
-
-### Feature Engineering
-
-Oh, where to start...
-
-One of the primary modes of feature engineering that I focused on in attempting to improve my model was feature transformations. These are cases where I could tell by looking at a plot of a feature vs the target variable that there was in fact a relationship there, but that it wasn't simply linear.
-
-
-
-<figure align="middle">
-  <img src="{static}/img/rel_plots.png" alt="rel-plots" style="width:100%">
-  <figcaption>Scatterplots showing selected features relative to both log- and non-log-transformed target variable.</figcaption>
-</figure>
-
-
-
-<figure align="middle">
-  <img src="{static}/img/log_transforms.png" alt="log-transforms" style="width:100%">
-  <figcaption>Scatterplots showing selected log-transformed features relative to both log- and non-log-transformed target variable.</figcaption>
-</figure>
-
-
 
 ### Optimizing our model and feature selection with feature scaling and regularization through lasso regression
 
