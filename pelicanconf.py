@@ -36,7 +36,7 @@ TAG_URL = 'tag/{slug}'
 TAG_SAVE_AS = 'tag/{slug}/index.html'
 
 PLUGIN_PATHS = ['plugins/pelican-plugins', ]
-PLUGINS = ['i18n_subsites', 'liquid_tags.img', 'liquid_tags.video',
+PLUGINS = ['i18n_subsites', 'post_stats', 'liquid_tags.img', 'liquid_tags.video',
            'liquid_tags.youtube', 'liquid_tags.vimeo',
            'liquid_tags.include_code', 'liquid_tags.notebook']
 JINJA_ENVIRONMENT = {'extensions': ['jinja2.ext.i18n']}
@@ -57,7 +57,7 @@ AUTHOR_FEED_RSS = None
 
 # Social widget
 SOCIAL = (('Github', 'https://github.com/BotScutters'),
-          ('LinkedIn', 'https://www.linkedin.com/in/scott-butters/'),)
+          ('LinkedIn', 'cd '),)
 
 # Blogroll
 LINKS = (('Metis', 'https://www.thisismetis.com'),)
