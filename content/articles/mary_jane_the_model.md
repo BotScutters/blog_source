@@ -72,11 +72,11 @@ I also used the Walkscore API to query their database for scores on how easily c
 * Pandas
 * Fuzzywuzzy
 
-##### Modeling:
+##### Modeling
 
 * Sklearn
 
-##### Visualization:
+##### Visualization
 
 * Matplotlib
 * Seaborn
