@@ -8,7 +8,7 @@ Slug: predicting-flight-cancellations
 Summary: Over 99% of scheduled domestic flights take off. That remaining 1% is very expensive, however, by some estimates costing the airline industry nearly a billion dollars every year. Can we use machine learning to predict these cancellations in advance to reduce the associated losses?
 Status: published
 
-Over 99% of all scheduled domestic flights take off, and the rest are very expensive. Of over 10 million flights scheduled flights each year, hundreds of thousands never leave the tarmac. At an average of $5770 in losses per cancellation this adds up to nearly a billion dollars of opportunity. While a significant chunk of those losses is unavoidable, it stands to reason that if an airline could confidently predict a cancellation far enough in advance, they could start taking measures to reduce those losses by doing things such as rebooking stranded passengers and rescheduling flight crews.
+Over 99% of all scheduled domestic flights take off, and the rest are very expensive. Of over 10 million scheduled flights each year, hundreds of thousands never leave the tarmac. At an average of $5,770 in losses per cancellation this adds up to nearly a billion dollars of opportunity. While a significant chunk of those losses is unavoidable, it stands to reason that if an airline could confidently predict a cancellation far enough in advance, they could start taking measures to reduce those losses by doing such things as rebooking stranded passengers and rescheduling flight crews.
 
 <figure>
   <img src="{static}/img/cancelled_flight.jpg" alt="cancelled-flight" style="width:100%">
@@ -51,7 +51,14 @@ There are a number of additional features that this model would likely benefit f
 - Numpy
 - Pandas
 
-##### Modeling:
+##### Feature Preparation
+
+* Sklearn
+  * Standard scaler
+  * PCA
+  * Select K Best
+
+##### Modeling
 
 - Sklearn
   - Logistic regression
@@ -65,7 +72,7 @@ There are a number of additional features that this model would likely benefit f
   - Multi-layer perceptron with linear activation function
   - Multi-layer perceptron with RELU activation function
 
-##### Visualization:
+##### Visualization
 
 - Matplotlib
 - Seaborn
@@ -81,7 +88,7 @@ There are a number of additional features that this model would likely benefit f
 
 Just acquiring the flight data for this project was a pretty significant task—over 50 GB of csvs. To handle such a time- and space-intensive dataset, I wrote a script to step through each individual file, strip away all of the data that wouldn't be useful for machine learning, then load the remaining data into a SQL database.   Reducing this down to only data I would use for training my models, which is all flights scheduled to depart from Seattle on or after January 1, 2006, this still left me with data on about 1.5 million flights.
 
-Of course, how could one predict flight cancellations without taking into account the weather? This, however, was much easier to acquire. For all of the weather data I simply signed up for a very affordable API key from Dark Sky and pulled hourly weather observations for every day I cared to predict on and loaded all of this into another table in my SQL database.
+Of course, how could one predict flight cancellations without taking into account the weather? This, however, was much easier to acquire. To acquire all of the weather data, I signed up for a very affordable API key from Dark Sky and pulled hourly weather observations for every day I cared to predict on and loaded all of this into another table in my SQL database.
 
 ### Feature Engineering
 
@@ -98,9 +105,9 @@ And of course more variations along those lines, with additional grouping featur
 
 #### Weather Data
 
-Parsing the weather data was quite a bit simpler, since it's already numeric. Since the weather data came in hourly increments and the flight data comes with a feature chunking flight times into hourly blocks (other than a large block from midnight to 6 am, for some godawful reason), I chose to to simply join up the weather features (temperature, cloud cover, precipitation, visibility and a few more) with the date and departure time blocks.
+Parsing the weather data was quite a bit simpler. In my initial calls to the API I loaded a handful of numeric features into my database, such as temperature, cloud cover, precipitation, visibility, and a few more. Since the weather data came in hourly increments and the flight data comes with a feature chunking flight times into hourly blocks (other than a large block from midnight to 6 am, for some godawful reason), I chose to join the weather features with the flight data using the date and departure time blocks as a composite key.
 
-The biggest hiccup, as I mentioned before, was the lack of historical *forecast* data, only historical observations. Since I wanted my model to be making predictions using only data that would be available to airlines 24 hours in advance of a flight, this called for a little bit of creativity. Modern weather forecasting is generally quite good, especially only a day in advance in the area around a major airport, so I decided to construct some features to serve as a proxy for actual forecasts. To do this, I simply generated a matrix of Gaussian noise centered around 1 with a standard deviation of 0.025 and multiplied this element-wise against a copy of my weather data. This resulted in a table of weather forecasts where about 95% of the values were within 5% of the actual observed values, approximating the accuracy of our actual weather forecasting systems.
+The biggest hiccup, as I mentioned before, was the lack of historical *forecast* data, only historical observations. Since I wanted my model to be making predictions using only data that would be available to airlines 24 hours in advance of a flight, this called for a little bit of creativity. Modern weather forecasting is generally quite good, especially only a day in advance in the area around a major airport, so I decided to construct some features to serve as a proxy for actual forecasts. To do this, I generated a matrix of Gaussian noise centered around 1 with a standard deviation of 0.025 and multiplied this element-wise against a copy of my weather data. This resulted in a table of weather forecasts where about 95% of the values were within 5% of the actual observed values, approximating the accuracy of our actual weather forecasting systems.
 
 ## Modeling and Cross-Validation
 
@@ -134,7 +141,7 @@ While my design matrix at this point was technically sufficient for modeling—t
 
 #### Inconsistent scaling
 
-With features describing cancellation rates, precipitation, temperature, and more, the scales of my data were all over the place. To handle this, I simply rescaled all of my features to be centered around a mean of 0 with a standard deviation of 1.
+With features describing cancellation rates, precipitation, temperature, and more, the scales of my data were all over the place. To handle this, I used sklearn Standard Scaler module to rescale all of my features to be centered around a mean of 0 with a standard deviation of 1.
 
 #### Too many features with not enough information
 
@@ -162,7 +169,7 @@ As a lazy human, option 1 sure was tempting. But as an overachiever, I couldn't 
 
 ### Custom Score Function
 
-Nearly ready to run my models, I found myself facing a critical question I'd been kicking around but putting off throughout the entire development process. How do I *judge* my models? While there are many standard responses out there for an imbalanced dataset (don't use accuracy, it's a trap!), how was I to know which one to use? I could use the [F1 score](https://en.wikipedia.org/wiki/F1_score), but giving equal weight to both precision and recall without a good reason feels awfully arbitrary. I could simply seek to maximize the area under the curve of my [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) score, but again, that's so divorced from the actual question I'm asking…so I did the natural thing and devised my own scoring metric.
+Nearly ready to run my models, I found myself facing a critical question I'd been kicking around but putting off throughout the entire development process. How do I *judge* my models? While there are many standard responses out there for an imbalanced dataset (don't use accuracy, it's a trap!), how was I to know which one to use? I could use the [F1 score](https://en.wikipedia.org/wiki/F1_score), but giving equal weight to both precision and recall without a good reason feels awfully arbitrary. I could seek to maximize the area under the curve of my [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) score, but again, that's so divorced from the actual question I'm asking…so I did the natural thing and devised my own scoring metric.
 
 I decided assign a cost/benefit value to each possible outcome of a prediction based on actual estimates of what these decisions would mean to an airline if they put the model into production. There are only four possible scenarios so…not too tough. Let me walk you through the reasoning.
 
@@ -172,13 +179,14 @@ I decided assign a cost/benefit value to each possible outcome of a prediction b
 * True Positive: The model correctly predicts that a flight that was actually cancelled would be cancelled. This is the holy grail, the real opportunity for savings. To quantify this, I made an assumption that with sufficient foreknowledge an airline could begin taking measures that would allow it to save some proportion of the expected losses due to cancellation, $\gamma_1$.
 
 That might seem a bit long winded, but don't worry: it gets a bit worse before it gets better. I threw out those gammas to represent cost and benefit, but what are those really? I did a bit of research and number crunching to make some best guess estimates, and in a nutshell it looks a little like this. Based on data from [this site](<https://247wallst.com/services/2014/10/29/the-high-cost-of-cancelled-airline-flights/>):
-* On average, a cancellation costs an airline about \$5,770
-* That can be narrowed down to about \$3,205 for flights canceled due to an uncontrollable event like weather and more like \$9,615 if the cancellation was due to something the airline should have been able to control, such as missing flight crew or maintenance.
+
+* On average, a cancellation costs an airline about $5,770
+* That can be narrowed down to about $3,205 for flights canceled due to an uncontrollable event like weather and more like \$9,615 if the cancellation was due to something the airline should have been able to control, such as missing flight crew or maintenance.
 * What that means is that about 45% of costs incurred due to cancellations *were avoidable*
 * This is extra money that goes towards things like inefficient usage of flight and maintenance crews as well as rebooking/reimbursing disgruntled passengers
-* This means that on average about \$2600 of the money lost due to a cancelled flight is money that the airline didn't have to lose. That's our margin to save from.
+* This means that on average about $2600 of the money lost due to a cancelled flight is money that the airline didn't have to lose. That's our margin to save from.
 
-On a similar note, taking some averages from a variety of resources, we can estimate that an average flight has about 100 passengers on board and makes about \$18 of profit per passenger. In other words, the average profit per flight is about \$1800.
+On a similar note, taking some averages from a variety of resources, we can estimate that an average flight has about 100 passengers on board and makes about $18 of profit per passenger. In other words, the average profit per flight is about \$1800.
 
 Finally, there's that dangling $\gamma_1$ variable I threw out there. This is a wild assumption that would have to be manipulated in a production setting, and it's worth noting that all of my extrapolated interpretations hinge on this value. That said, I had to choose something. So what's it mean? I decided that a conservative estimate was that with sufficient foresight, an airline could maybe take back about 10% of that $2600 recoverable margin I mentioned above. In reality that might be 5 or 50, I'm not sure—but I went with 10.
 
@@ -205,7 +213,7 @@ A point worth noticing is that pretty much all of the models seemed to plateau r
 
 ## Conclusion
 
-The final result of a score 0.08 isn't stellar, but I think it's worth noting that it's not actually terrible either. Putting it into real world terms, this number means that my model correctly predicted 8% of all of SeaTac's flight cancellations in the year 2018 a full 24 hours before they happened. What's more, the model did this without making a single false positive prediction, which means that if airlines were utilizing the model, there would be zero mistaken cancellations and room for an estimated \$12,000 in savings. Not an amount I'd get too excited about, but if you extrapolate that out to every airport in the US, now we're looking at more like a potential for around \$2 million dollars in savings per year. Not so shabby after all.
+The final result of a score 0.08 isn't stellar, but I think it's worth noting that it's not actually terrible either. Putting it into real world terms, this number means that my model correctly predicted 8% of all of SeaTac's flight cancellations in the year 2018 a full 24 hours before they happened. What's more, the model did this without making a single false positive prediction, which means that if airlines were utilizing the model, there would be zero mistaken cancellations and room for an estimated $12,000 in savings. Not an amount I'd get too excited about, but if you extrapolate that out to every airport in the US, now we're looking at more like a potential for around \$2 million dollars in savings per year. Not so shabby after all.
 
 ## Future Work
 
