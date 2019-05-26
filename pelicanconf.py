@@ -57,7 +57,7 @@ AUTHOR_FEED_RSS = None
 
 # Social widget
 SOCIAL = (('Github', 'https://github.com/BotScutters'),
-          ('LinkedIn', 'cd '),)
+          ('LinkedIn', 'https://www.linkedin.com/in/scott-butters/'),)
 
 # Blogroll
 LINKS = (('Metis', 'https://www.thisismetis.com'),)
