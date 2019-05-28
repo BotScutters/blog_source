@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Speakeasy, the AI Bartender - Bits 'n' Bots</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<style type="text/css">
+
+/*some stuff for output/input prompts*/
+div.cell{border:1px solid transparent;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch}div.cell.selected{border-radius:4px;border:thin #ababab solid}
+div.cell.edit_mode{border-radius:4px;border:thin #008000 solid}
+div.cell{width:100%;padding:5px 5px 5px 0;margin:0;outline:none}
+div.prompt{min-width:11ex;padding:.4em;margin:0;font-family:monospace;text-align:right;line-height:1.21429em}
+@media (max-width:480px){div.prompt{text-align:left}}div.inner_cell{display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch;-webkit-box-flex:1;-moz-box-flex:1;box-flex:1;flex:1}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;line-height:1.21429em}
+div.prompt:empty{padding-top:0;padding-bottom:0}
+div.input{page-break-inside:avoid;display:-webkit-box;-webkit-box-orient:horizontal;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:horizontal;-moz-box-align:stretch;display:box;box-orient:horizontal;box-align:stretch;}
+div.inner_cell{width:90%;}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;}
+div.input_prompt{color:navy;border-top:1px solid transparent;}
+div.output_wrapper{margin-top:5px;position:relative;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.output_scroll{height:24em;width:100%;overflow:auto;border-radius:4px;-webkit-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);-moz-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);}
+div.output_collapsed{margin:0px;padding:0px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.out_prompt_overlay{height:100%;padding:0px 0.4em;position:absolute;border-radius:4px;}
+div.out_prompt_overlay:hover{-webkit-box-shadow:inset 0 0 1px #000000;-moz-box-shadow:inset 0 0 1px #000000;box-shadow:inset 0 0 1px #000000;background:rgba(240, 240, 240, 0.5);}
+div.output_prompt{color:darkred;}
+
+a.anchor-link:link{text-decoration:none;padding:0px 20px;visibility:hidden;}
+h1:hover .anchor-link,h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link,h5:hover .anchor-link,h6:hover .anchor-link{visibility:visible;}
+/* end stuff for output/input prompts*/
+
+
+.highlight-ipynb .hll { background-color: #ffffcc }
+.highlight-ipynb  { background: #f8f8f8; }
+.highlight-ipynb .c { color: #408080; font-style: italic } /* Comment */
+.highlight-ipynb .err { border: 1px solid #FF0000 } /* Error */
+.highlight-ipynb .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight-ipynb .o { color: #666666 } /* Operator */
+.highlight-ipynb .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight-ipynb .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight-ipynb .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight-ipynb .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight-ipynb .gd { color: #A00000 } /* Generic.Deleted */
+.highlight-ipynb .ge { font-style: italic } /* Generic.Emph */
+.highlight-ipynb .gr { color: #FF0000 } /* Generic.Error */
+.highlight-ipynb .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight-ipynb .gi { color: #00A000 } /* Generic.Inserted */
+.highlight-ipynb .go { color: #888888 } /* Generic.Output */
+.highlight-ipynb .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight-ipynb .gs { font-weight: bold } /* Generic.Strong */
+.highlight-ipynb .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight-ipynb .gt { color: #0044DD } /* Generic.Traceback */
+.highlight-ipynb .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight-ipynb .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight-ipynb .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight-ipynb .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight-ipynb .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight-ipynb .kt { color: #B00040 } /* Keyword.Type */
+.highlight-ipynb .m { color: #666666 } /* Literal.Number */
+.highlight-ipynb .s { color: #BA2121 } /* Literal.String */
+.highlight-ipynb .na { color: #7D9029 } /* Name.Attribute */
+.highlight-ipynb .nb { color: #008000 } /* Name.Builtin */
+.highlight-ipynb .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight-ipynb .no { color: #880000 } /* Name.Constant */
+.highlight-ipynb .nd { color: #AA22FF } /* Name.Decorator */
+.highlight-ipynb .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight-ipynb .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight-ipynb .nf { color: #0000FF } /* Name.Function */
+.highlight-ipynb .nl { color: #A0A000 } /* Name.Label */
+.highlight-ipynb .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight-ipynb .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight-ipynb .nv { color: #19177C } /* Name.Variable */
+.highlight-ipynb .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight-ipynb .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight-ipynb .mf { color: #666666 } /* Literal.Number.Float */
+.highlight-ipynb .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight-ipynb .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight-ipynb .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight-ipynb .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight-ipynb .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight-ipynb .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight-ipynb .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight-ipynb .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight-ipynb .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight-ipynb .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight-ipynb .sx { color: #008000 } /* Literal.String.Other */
+.highlight-ipynb .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight-ipynb .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight-ipynb .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight-ipynb .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight-ipynb .vc { color: #19177C } /* Name.Variable.Class */
+.highlight-ipynb .vg { color: #19177C } /* Name.Variable.Global */
+.highlight-ipynb .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight-ipynb .il { color: #666666 } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+<script type="text/javascript">
+init_mathjax = function() {
+    if (window.MathJax) {
+        // MathJax loaded
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+            },
+            displayAlign: 'left', // Change this to 'center' to center equations.
+            "HTML-CSS": {
+                styles: {'.MathJax_Display': {"margin": 0}}
+            }
+        });
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    }
+}
+init_mathjax();
+</script>
+
+<link rel="canonical" href="/articles/2019/05/27/Speakeasy-AI-Bartender/">
+
+        <meta name="author" content="Scott Butters" />
+        <meta name="keywords" content="Python,Data Science,NLP,SVD,LSA,Cocktails,Recommender,Flask,App,Robots,AI,The Singularity" />
+        <meta name="description" content="You know that thing where you&#39;re hanging out in a schmancy speakeasy and the bartender asks you what you&#39;d like to have—not in terms of a specific cocktail, or even the base spirit, but in terms of the flavor profile? And then just sets to work grabbing one bottle after another until before you know it you&#39;ve got a little bit of magic in your mouth and you don&#39;t even know how? That. That right there is the epitome of mixology, as far as I&#39;m concerned. That&#39;s &#34;the speakeasy experience.&#34; That&#39;s what I&#39;ve sought to recreate with this app." />
+
+        <meta property="og:site_name" content="Bits 'n' Bots" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Speakeasy, the AI Bartender"/>
+        <meta property="og:url" content="/articles/2019/05/27/Speakeasy-AI-Bartender/"/>
+        <meta property="og:description" content="You know that thing where you&#39;re hanging out in a schmancy speakeasy and the bartender asks you what you&#39;d like to have—not in terms of a specific cocktail, or even the base spirit, but in terms of the flavor profile? And then just sets to work grabbing one bottle after another until before you know it you&#39;ve got a little bit of magic in your mouth and you don&#39;t even know how? That. That right there is the epitome of mixology, as far as I&#39;m concerned. That&#39;s &#34;the speakeasy experience.&#34; That&#39;s what I&#39;ve sought to recreate with this app."/>
+        <meta property="article:published_time" content="2019-05-27" />
+            <meta property="article:section" content="blog" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:tag" content="Data Science" />
+            <meta property="article:tag" content="NLP" />
+            <meta property="article:tag" content="SVD" />
+            <meta property="article:tag" content="LSA" />
+            <meta property="article:tag" content="Cocktails" />
+            <meta property="article:tag" content="Recommender" />
+            <meta property="article:tag" content="Flask" />
+            <meta property="article:tag" content="App" />
+            <meta property="article:tag" content="Robots" />
+            <meta property="article:tag" content="AI" />
+            <meta property="article:tag" content="The Singularity" />
+            <meta property="article:author" content="Scott Butters" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.spacelab.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Bits 'n' Bots            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about-me/">
+                             About Me
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/blog">Blog</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+<!-- Content Container -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/articles/2019/05/27/Speakeasy-AI-Bartender/"
+                       rel="bookmark"
+                       title="Permalink to Speakeasy, the AI Bartender">
+                        Speakeasy, the AI Bartender
+                    </a>
+                </h1>
+                <p><small>
+                    <span class="published">
+                        <time datetime="2019-05-27T17:00:00-07:00"> Mon 27 May 2019</time>
+                    </span>
+                    ~ 15 min read
+                </small></p>
+            </header>
+
+            <div class="entry-content">
+                <p>You know that thing where you're hanging out in a schmancy speakeasy and the bartender asks you what you'd like to have—not in terms of a specific cocktail, or even the base spirit, but in terms of the flavor profile? And then just sets to work grabbing one bottle after another until before you know it you've got a little bit of magic in your mouth and you don't even know how? That. That right there is the epitome of mixology, as far as I'm concerned. That's "<a href="http://speakeasy-ai-bartender.herokuapp.com/">the speakeasy experience</a>." That's what I've sought to recreate with this app.</p>
+<figure>
+  <img src="/img/bar.jpg" alt="speakeasy-bar" style="width:100%">
+  <figcaption>My home bar, soon to be tended by my personal AI assistant.</figcaption>
+</figure>
+
+<h1>Abstract</h1>
+<p><a href="http://speakeasy-ai-bartender.herokuapp.com/">The SpeakEasy app</a> is a cocktail recommendation engine that's built to transform plain English requests from a user into a suggested cocktail that best matches the request. The functionality of this system rests on three systems:</p>
+<ul>
+<li>A database of cocktails, containing recipes, descriptions, and metadata for each.</li>
+<li>A model trained to vectorize and transform text describing a cocktail into an appropriate topic space.</li>
+<li>An app that uses the model trained on the cocktail database to make new predictions based on user's request.</li>
+</ul>
+<p>The first production version of the app is making use of cocktail data scraped from <a href="https://www.diffordsguide.com/cocktails">Difford's Guide</a>. The text data from each cocktail is processed into a document-term matrix using a TF-IDF vectorizer, then factored into a document (cocktail)-topic matrix using latent semantic analysis (LSA). Finally, the data, vectorizer and LSA transformation matrix are packaged into a Flask app and hosted on Heroku so all the world can get the drink they're itching for.</p>
+<p>The code for both the <a href="https://github.com/BotScutters/SpeakEasy">SpeakEasy modeling</a> and <a href="https://github.com/BotScutters/speakeasy-app">SpeakEasy app</a> are available on my <a href="https://github.com/BotScutters">GitHub</a>.</p>
+<h1>Data Sources</h1>
+<p>Data! As much as with any other project, building this app demonstrated to me the value of high quality data, though this time with a particular flavor. That is, I started out using a dataset of cocktail recipes that were mostly terrible concoctions of flavored vodka and fruit juice. As they say, garbage juice in, garbage juice out. It wasn't until late in the model development that I decided I really ought to revisit step one and collect all new data. More on that later. </p>
+<p>In principle, though, in order for the recommendation algorithm to make decent suggestions given a variety of input types (i.e. the user might ask for a type of cocktail ("Manhattan variation"), a taste profile ("sweet and sour"), a combination ("spicy margarita"), or really any other thing) I needed a data source with not just a large number of high quality drinks, but also a substantial amount of text dedicated to describing the various qualities of the cocktails.</p>
+<h2><a href="https://drizly.com/recipes#all-recipes">Drizly</a></h2>
+<p>They've got a decent collection of about 600 cocktails, mostly pretty well described. I actually started out working with this dataset as my primary source. It's got two main downfalls, though: the formatting is somewhat inconsistent, making it impractical to extract recipes in a meaningful way, and more importantly, the cocktail list is padded with recipes that I'll snobbishly call garbage juice and seemed to give SpeakEasy a bias towards suggesting drinks that might glow under a blacklight, give you cancer, or both. No thanks. </p>
+<h2><a href="https://www.diffordsguide.com/cocktails">Difford's Guide</a></h2>
+<p>Difford's Guide was my gold mine. Every cocktail on the site has been sampled, reviewed and rated by Mr. Difford himself, and from what I can tell the man's got standards. The drinks are good and interesting, the descriptions are generally decent for a NLP analysis, the website is laid out in a way that's relatively easy to scrape—a beautifully balanced data source for what I was looking for in this project. But the garnish that really tied the site together was that the recipe ingredients are all presented with consistent units and in a table format, making it exceedingly easy to extract the information and process it on the modeling end. Standardized units are the things of an engineer's dreams!</p>
+<h2>Future Data Sources</h2>
+<p>In the course of preparing this app I flagged a number of resources for cocktail recipes that would be fantastic to incorporate down the line. One of the biggest challenges in integrating them is simply the variations in website formatting and different types of available information (which could also be viewed as a strength, through a certain lens).</p>
+<ul>
+<li><a href="https://kindredcocktails.com/cocktail?scope=0">Kindred Cocktails</a> - a strong cocktail database with lots of metadata to back it up. I briefly spoke with Dan, their Chief Swizzlestick, about a collaboration, but that seems to have fizzled out for now. Nonetheless, they're doing great work. Perhaps a relationship will be rekindled when I pick this back up.</li>
+<li><a href="https://www.thespruceeats.com/a-to-z-cocktail-recipes-3962886">Spruce Eats</a> - They've got a strong showing of about 1000 cocktails with pretty verbose descriptions. Just a matter of doing the work to incorporate.</li>
+<li><a href="https://docs.google.com/spreadsheets/d/1W59zl7F534rHhRhzxxAH0EMqbe4H7qGz646srCpRnXw/pub?single=true&amp;gid=0&amp;output=html">Imbibe + PDT Cocktails</a> - a Reddit user put together this spreadsheet of cocktails. Lots of fantastic drinks, but sorely lacking in good descriptions. Would require a strong ingredient description library to cross reference and build-up the descriptions.</li>
+</ul>
+<h2>Tools</h2>
+<h5>Code</h5>
+<ul>
+<li>Python</li>
+<li>Jupyter notebook</li>
+</ul>
+<h5>Data exploration and cleaning</h5>
+<ul>
+<li>Regex</li>
+<li>Numpy</li>
+<li>Pandas</li>
+</ul>
+<h5>Feature Preparation and NLP Modeling</h5>
+<ul>
+<li>Gensim Doc2Vec</li>
+<li>Sklearn</li>
+<li>TfidfVectorizer</li>
+<li>TruncatedSVD</li>
+<li>cosine_similarity</li>
+</ul>
+<h5>Visualization</h5>
+<ul>
+<li>Matplotlib</li>
+<li>Hvplot</li>
+<li>SkLearn TSNE</li>
+</ul>
+<h5>Workflow management</h5>
+<ul>
+<li>DataScienceMVP</li>
+<li>Cookiecutter</li>
+</ul>
+<h2>Data Acquisition</h2>
+<p>Scraping the cocktail data from Difford's Guide took two main steps: putting together a list of all of the cocktails I wanted to get data on (as well as URLs to each cocktail's page), and then actually going to the pages and getting the cocktail data.</p>
+<h3>Getting the List of Cocktails</h3>
+<p>To get my list of cocktails to scrape, I made use of the advanced search feature of the site. I found that if I conducted an advanced search to show me all cocktails with a rating of 3 stars or higher (gotta set the bar somewhere…), the page returned a total of well over 4,000 cocktails spread across over 100 pages. After a bit of investigation, I found that the URL carried all of the parameters and sending them through an internal API, including an offset parameter indicating which page to load. Jackpot! I wrote a function that generated URLs for each page, then proceeded to pull the source html from each page using Python's requests library and then parse the html with BeautifulSoup to extract the names and URLs of all displayed cocktails.</p>
+<p>Side note: an interesting hiccup I ran into while doing this is that I kept on coming up short of the expected number of cocktails I'd scrape from the page. After a bit of puzzling, I found that the cocktails were being displayed sorted by rating…but! Turns out that when cocktails had an identical rating, i.e. 100 different cocktails might have a 3.5 star rating, the order <em>within</em> that rating group is (apparently) random. What's worse, the order seems to be calculated on every page load, since duplicates were regularly found on the following page. I ended up resolving this by having the list render sorted by name rather than rating.</p>
+<h3>Getting Data on Each Cocktail</h3>
+<p>I used two methods to get each individual cocktail's data. I started out by pulling the source html into BeautifulSoup and parsing it for various desired attributes, similar to above. However, one fun trick I employed was using the Pandas read_html function to do a lot of the parsing. The first table I pulled was the one containing each cocktail's recipe. I converted this directly into a DataFrame so I could easily extract different elements from the table, then converted the table <em>back</em> into html using the to_html function. With only a little bit of clean-up and modification, this table is what I ultimately fed directly into the app later on to show a user the recipe! The other table I pulled is what contained the bulk of the text I used for each cocktail, i.e. description, garnish, instructions, etc. Because each cocktail might actually have a different number of entries in the table, pulling the table wholesale like this made the process much simpler to parse.</p>
+<h2>Data Preparation</h2>
+<p>Coming out of the acquisition stage I had all of my cocktail data effectively stored in JSON format. Before I could properly vectorize each cocktail, I needed to clean and combine the text for each cocktail into a single "document" or "bag of words". Basically what this meant was stepping through the data for each individual cocktail and appending all of the entries that seemed like they might be useful (descriptions, ingredients, etc.) into a single long string. Finally, I fed each string through a text cleaning function to remove extraneous html tags and unicode characters that managed to sneak their way in.</p>
+<h2>Modeling: LSA or Doc2Vec?</h2>
+<p>Oh, I spent a long time on this one, and frankly, I bet I'll spend more, as there's still more data to add and more algorithms to try out. But as of this writing I can say that I have fiercely pitted latent semantic analysis (LSA) against a Doc2Vec embedding and thus far LSA is winning. I'll come back to this.</p>
+<p>But from a high level, SpeakEasy behaves the same regardless of which method is in use:</p>
+<p>To train the model:</p>
+<ol>
+<li>Feed text from all cocktails in dataset into model and have model learn the overall vocabulary as well as various word frequencies within each cocktail description. The model is trained on this.</li>
+<li>Convert text of each cocktail description into a numerical vector representation.</li>
+</ol>
+<p>To make a suggestion:</p>
+<ol>
+<li>Receive user input in the form of a string.</li>
+<li>Using trained model, transform string into numerical vector.</li>
+<li>Suggest cocktail exhibiting the highest cosine similarity to this new vector.</li>
+</ol>
+<p>Note that this method is making the assumption that (a) training data is robust, and that (b) our user input text contains relevant words that were represented in the original data. A bit obvious, but significant. A nonsense request will yield a nonsense suggestion. A request for a rare ingredient or unusual descriptor may well fall on deaf ears and, again, yield a nonsense suggestion.</p>
+<p>But now to the nitty gritty: how do we convert a string of text into numbers? The potential methods are many and the choice has a significant impact on what comes out the other side.</p>
+<h3>Latent Semantic Analysis</h3>
+<p>There are two main steps for implementing LSA: converting the text data to a numerical representation using <a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">Sklearn's term frequency-inverse document frequency (TF-IDF) vectorization</a>, and reducing the dimensionality of the newly created document-term matrix into a document-topic space using <a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html">Sklearn's TruncatedSVD</a> function. This yields a topic-document matrix, which is what we ultimately compare the vector generated from user input against.</p>
+<p>There are a few choices to be made in tuning this model. </p>
+<p>For the vectorizer, I'm pre-processing the text by stripping all unicode accents, lowercasing all uppercase characters, and removing stop words (common words that contribute no meaning, such as "the", "and", etc.). I'm also creating additional tokens by including in my document-term matrix not just individual words, but also bigrams (all sets of two consecutive words from the processed text). There certainly exist further steps I could take that may improve model performance even further, including: stemming or lemmatizing tokens down to base forms, adding to or modifying the stock stop words than come built in to the library, adjusting frequency thresholds for which words make it into the model, and experimenting further with which ngrams to include.</p>
+<p>For the TruncatedSVD model, the primary choice to make was the number of vectors to reduce the document-term matrix down to. Evaluating this was tricky, but the method I ended up settling on was choosing a few test phrases to simulate user input and manually/subjectively measuring how good the suggestions were. Test phrases I tried were:</p>
+<ul>
+<li>"Give me something sweet and smoky, like a margarita with mezcal"</li>
+<li>"can you make me a bitter manhattan variation with fernet?"</li>
+</ul>
+<p>From there I looked at the different drinks suggested depending on the number of dimensions I was reducing to, and what types of features appeared to be captured by the algorithm.</p>
+<p>Ultimately what I found is that over approximately 100 dimensional vectors, though I was only capturing about 25% of the variance in the documents, there seemed to be diminishing returns and little change in the suggestions. I ended up settling at 128 dimensions per vector, though I fully expect that number to shift a bit as/when I add additional data to the model.</p>
+<h3>Doc2Vec</h3>
+<p><a href="https://radimrehurek.com/gensim/models/doc2vec.html">Doc2Vec</a> is a paragraph embedding model built on top of Word2Vec to give a numeric representation of an entire paragraph based on a continuous-bag-of-words model and a skip gram model. Effectively, Doc2Vec extends the functionality of Word2Vec from looking just at individual words and the few that surround them to looking at all of the words that make up a document and then producing a vector representation of that entire document.</p>
+<p>With this project, that means that Doc2Vec can potentially be a drop-in replacement for TF-IDF and Truncated SVD as described above. To train the model, we:</p>
+<ol>
+<li>Preprocess each document, similar to how we did with LSA</li>
+<li>Instantiate a model with some hyperparameters</li>
+<li>Build a vocabulary of all tokens in document</li>
+<li>Train model on corpus </li>
+</ol>
+<p>To make suggestions, we run the user input through the same processing engine, infer a vector for the new document, and return the cocktail with highest cosine similarity.</p>
+<p>But, I hear you asking, <em>what about those hyperparameters?</em></p>
+<p>Ah yes, the hyperparameters.</p>
+<p>So I wrote a grid search algorithm. Starting coarse and working my way toward an optimal configuration, I adjusted the values for number of dimensions per vector, number of epochs to train the model over, and the number of steps (epochs) to use for inferring the vector for test data. After much iteration, I landed on parameters of a vectorsize of 100, 400 epochs, and 3 steps. That should raise two big questions: wait, how'd you even decide what to call "good" in order to tune the model? And that aside, how'd you end up at 400 epochs when all the literature suggests you should be well below 100? </p>
+<p>I know. And it was a headache that I'm sure I'm not over with. But let's step through one at a time.</p>
+<p>For measuring goodness of fit, I decided to test how well the model would do at matching the text description of a cocktail <em>to itself</em>. This is actually a pretty reasonable test with Doc2Vec, as the way it constructs the document vector is non-deterministic. That is to say, even after setting random seeds anywhere I could and even my Python hash seed, the model would <em>still</em> infer a different (albeit similar) document vector for each document every time I ran it through. Though in practice I won't be feeding long description documents into the model, in theory I do want it to be fit well enough that when making a cocktail suggestion based on a document the model has been trained on, the correct answer is at least <em>close</em> to the best match.</p>
+<p>So that was my parameter. For every configuration of hyperparameters that I tested, I ran each cocktail through the prediction function and took the average of all the rankings where I found the cocktail the test description had come from to be the error I wanted to minimize. This harrowing journey brought me to the parameters mentioned above, at which each cocktail would <em>on average</em> be the predicted as the 6th best match with itself.</p>
+<p>As for the parameters: from what I've reae about Doc2Vec, I expected epochs to be happier closer to 20, and that I shouldn't need to specify the steps parameter at all—but these made a huge difference in performance. The vector size actually ended up around a reasonable value. A theory I have for <em>why</em> the epochs seem so far off from what I'd expect is that my data may not actually fit the idea of a continuous bag of words all that well, given that adjacent words may sometimes be unrelated, if it's just a list of ingredients, and the topics jump around due to the way I combined the different fields from the website into a single document. Each document is not actually a continuous set of words so much as several groups of words bunched together.</p>
+<h3>Comparing the Two Methods</h3>
+<p>Gripes about Doc2Vec parameters aside, how'd they perform? For a final test, I basically replicated the procedure I used to tune the LSA model (though in hindsight I really should have tried manually tuning the Doc2Vec model this way; in the future I will). When comparing the output of each model to the same input, it was clear that LSA made suggestions that were far more relevant to the input request than what Doc2Vec was spitting out. So disappointing.</p>
+<h2>Packaging and Serving as an App</h2>
+<p>After finalizing the model I'd work with, it was time to package it all up and serve it in an app. To do this, I wrote an app using the Python's <a href="http://flask.pocoo.org/">Flask</a> library along with Bootstrap for the templates and web styling and an API to pass the data back and forth between Javascript and Python. The app is now hosted <a href="http://speakeasy-ai-bartender.herokuapp.com/">here</a> using <a href="www.heroku.com">Heroku</a>.</p>
+<p>An interesting (and ongoing) challenge I ran into while deploying the app was due to the file size. The upon pickling, the LSA model ends up being well over 100 MB, meaning that it can't be stored to and pulled from Github like the rest of the app. I resolved this by storing all of my pickled model files on Amazon S3, and adding a step to the app's startup sequence to download all of the models from AWS. While technically I could get away with compressing the LSA model to under 100 MB and then unzipping it upon loading the program, I think I will stick with the S3 method, as this will allow me to scale my dataset larger in the future.</p>
+<p>An additional problem, however, is that Heroku only grants 500 MB of RAM to an app unless you upgrade all the way to the third price tier. Not that that's an insane thing to do…but for a prototype? Not yet. So as of now, my app has been averaging a load of about 590 MB RAM, which means I'm receiving constant warnings that I'm above their threshhold. Fortunately, they're friendly enough to allow the app to keep running without erroring out completely. That said, I recognize SpeakEasy is in treacherous waters here and that I really ought to spend some time figuring out how to reduce the memory requirements of the app.</p>
+<h2>Conclusion</h2>
+<p>I've been dreaming about this app for a long time, and it's been hard work and a ton of fun bringing it to fruition. But…is SpeakEasy done? If you haven't picked up on it by now: SpeakEasy is a work in progress. There are bugs, sure, and I can see some flaws in the first steps I took. But also, I've got a ton of ideas about how I want to <em>improve</em> SpeakEasy. On the laundry list:</p>
+<ul>
+<li>More data, always more data. Incorporate more cocktails from additional sources.</li>
+<li>Build a database of ingredients with descriptions of each of those. Cross-reference cocktail recipes with ingredient database to pad cocktail descriptions.</li>
+<li>Experiment with more methods of text preprocessing, primarily trying out stemming vs lemmatizing and doing some cross-sectional analysis to identify additional stop words to add. </li>
+<li>An additional interesting approach could be taking the text input and actually padding it with synonyms of the entered words. Could help to handle words that are similar but still different. </li>
+<li>Could also do some level of hierarchically classifying ingredients.</li>
+<li>Modeling methods! How well would the model perform if I used a probabilistic Latent Semantic Analysis (PSLA)? Or Latent Dirichlet Allocation (LDA) or Nonnegative Matrix Factorization (NMF)? What about going deeper down the embedding hole and trying lda2vec? Okay, but what if I go even deeper, all the way down the deep learning rabbit hole and implement some <a href="https://arxiv.org/pdf/1707.07435.pdf">neural net magickry as described in this paper</a>? Okay, I'm done now. Except not, I'll definitely obviously try all of these just as soon as I find all the time. I want to, at least.</li>
+<li>Develop a better testing method for evaluating goodness of model fit. Because you know what didn't feel good? My testing method, both for tuning hyperparameters and choosing a model. A better method and more quantifiable scoring metric would do worlds of good. Ideas? Let's talk!</li>
+<li>Improve user interface of app. Currently it's not exactly reliable in terms of uptime, rendering on different devices, and even predictions. </li>
+<li>Improve memory management of app. Even if I don't make drastic changes to the models, I could still switch to Gensim's implementation of Latent Semantic Indexing, which utilizes better memory management (constant size, not impacted by size of corpus) as well as the ability to update the model with streaming data (bonus!).</li>
+<li>Add logging for user requests and suggested matches (believe it or not, I'm not tracking you), and provide user with the ability to up or downvote the recommendation they received. Long term it would be awesome to incorporate that into the suggestions, but short term I could even use it for guiding choices about model development.</li>
+<li>Build sister app, the AI Budtender. I've already done a bunch of the legwork, as described in my previous blog about scraping dispensary data off of <a href="http://localhost:8000/articles/2019/04/29/scraping-leafy/">Leafly.com</a>. Extending the code I wrote there to get data on all of the different strains wouldn't be a very big stretch, and SpeakEasy would pretty happily train on that dataset without so much as a "No way, man." </li>
+<li>Thirteenth but not last, INVENT COCKTAILS! This is the problem I'm most excited to work on, but it's…bigger. I want to develop the algorithm that won't just suggest a cocktail near to a description but actually invent the recipe that matches it best—and to it well. There are a lot of problems baked into that question, but man do I want to figure out how to answer them.</li>
+<li>This isn't over.</li>
+</ul>
+<p>Thanks for reading and feel free to reach out with questions or comments!</p>
+            </div>
+            
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="https://github.com/BotScutters"><i class="fa fa-github-square fa-lg"></i> Github</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/scott-butters/"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="https://www.thisismetis.com" target="_blank">Metis</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+
+<!-- Sidebar/Tag Cloud -->
+<li class="list-group-item">
+  <a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+  <ul class="list-group " id="tags">
+    <li class="list-group-item tag-1">
+      <a href="/tag/python">Python</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/data-science">Data Science</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/robots">Robots</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/ai">AI</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/the-singularity">The Singularity</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/nlp">NLP</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/svd">SVD</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/lsa">LSA</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/cocktails">Cocktails</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/recommender">Recommender</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/flask">Flask</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/app">App</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/web-scraping">Web Scraping</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/leafly">Leafly</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/marijuana">Marijuana</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Tag Cloud -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2019 Scott Butters
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+</body>
+</html>

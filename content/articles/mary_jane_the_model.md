@@ -3,7 +3,7 @@ Author: Scott Butters
 Date: 2019-04-20 14:15
 Modified: 2019-04-21 12:10
 Category: blog
-Tags: python, data science, web scraping, leafly, marijuana, washington
+Tags: Python, Data Science, Web Scraping, Leafly, Marijuana, Washington
 Slug: mary-jane-model
 Summary: In 2012, Washington state passed I-502 and legalized the recreational sale, use, and possession of marijuana. This event has led to an explosion of development in the field that's making waves through our society. Since 2014, approximately 500 state licensed dispensaries have opened throughout the state, with nearly 150 of those here in Seattle. In this project I scour the web for publicly available data that might be predictive of how a cannabis dispensary performs, such as customer reviews, inventory distributions, and local demographics. I then train machine learning models to predict a dispensary's monthly revenue and analyze the resulting models to distill insights about what drives sales in the marijuana market.
 Status: published

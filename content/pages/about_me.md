@@ -10,5 +10,4 @@ status: published
 
 ## About Me
 
-I'm Scott Butters, data scientist and engineer, versed in python, robotics, and the impending singularity.
-In other words, I create bits and bots, and I'm deeply interested in the ways they're becoming more and more infused and entangled in our lives.
+I'm Scott Butters, data scientist and engineer, versed in machine learning, robotics, and the impending singularity (that is, I create bits and bots, and I'm deeply interested in the ways they're becoming more and more infused and entangled in our lives (and I like philosophy, and futurism, repetition, and deeply nested parentheses))).

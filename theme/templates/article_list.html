@@ -4,10 +4,13 @@
         {% for article in (articles_page.object_list if articles_page else articles) %}
             <article>
                 <h2><a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></h2>
-                <span class="label label-default">Date</span>
-                <span class="published">
-                    <time datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }}</time>
-                </span>
+                <!--<span class="label label-default">Date</span>-->
+                <p><small>
+                    <span class="published">
+                        <time datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }}</time>
+                    </span>
+                    ~ {{ article.stats['read_mins'] }} min read
+                </small></p>
                 <!--<span class="label label-default">Read</span>
                 <i title=" ᛫  ~{{ article.stats['wc'] }} words">~{{ article.stats['read_mins'] }}  min read</i>
                 <br>-->
@@ -19,11 +22,7 @@
                 <div class="summary">{{ article.summary }}
                     {% include 'includes/comment_count.html' %}
                     
-                    <span class="label label-default">
-                        <a href="{{ SITEURL }}/{{ article.url }}">
-                            <i>~ {{ article.stats['read_mins'] }} minutes more...</i>
-                        </a>
-                    </span>
+                    
                     <!--<span>
                         <span class="published">
                             <time datetime="{{ article.date.isoformat() }}">{{ article.locale_date }}</time>

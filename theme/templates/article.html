@@ -78,16 +78,18 @@
                         {{ article.title }}
                     </a>
                 </h1>
-                <!--<p title="~{{ article.stats['wc'] }} words">~{{ article.stats['read_mins'] }} min read</p>-->
+                <p><small>
+                    <span class="published">
+                        <time datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }}</time>
+                    </span>
+                    ~ {{ article.stats['read_mins'] }} min read
+                </small></p>
             </header>
+
             <div class="entry-content">
-                <div class="panel">
-                    <div class="panel-body">
-                        {% include "includes/article_info.html" %}
-                    </div>
-                </div>
                 {{ article.content }}
             </div>
+            
             <!-- /.entry-content -->
             {% include 'includes/related-posts.html' %}
             {% include 'includes/series.html' %}

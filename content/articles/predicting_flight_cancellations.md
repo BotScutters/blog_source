@@ -3,7 +3,7 @@ Author: Scott Butters
 Date: 2019-05-08 19:35
 Modified: 2019-05-08 19:35
 Category: blog
-Tags: SQL, python, data science, machine learning, classification, neural net, time-series
+Tags: SQL, Python, Data Science, Machine Learning, Classification, Neural Net, Time-Series
 Slug: predicting-flight-cancellations
 Summary: Over 99% of scheduled domestic flights take off. That remaining 1% is very expensive, however, by some estimates costing the airline industry nearly a billion dollars every year. Can we use machine learning to predict these cancellations in advance to reduce the associated losses?
 Status: published

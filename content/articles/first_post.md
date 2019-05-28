@@ -3,7 +3,7 @@ Author: Scott Butters
 Date: 2019-04-20 12:38
 Modified: 2019-04-20 12:57
 Category: blog
-Tags: python, data science, robots, AI, the singularity
+Tags: Python, Data Science, Robots, AI, The Singularity
 Slug: my-first-blog-post
 Summary: Introduction to what the bits 'n' bots blog is about
 Status: published

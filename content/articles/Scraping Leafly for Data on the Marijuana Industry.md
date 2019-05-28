@@ -2,7 +2,7 @@ Title: Scraping Leafly.com for Data on the Marijuana Industry
 Date: 2019-04-29 16:20
 Modified: 2019-04-29 16:20
 Category: blog
-Tags: python, data science, web scraping, leafly, marijuana, washington
+Tags: Python, Data Science, Web Scraping, Leafly, Marijuana, Washington
 Slug: scraping-leafy
 Summary: Leafly is an information aggregator for cannabis. They maintain a profile for most of the dispensaries in the state. This makes them a pretty valuable resource for studies on the cannabis industry. Here's how I scraped Leafly for ratings, reviews, inventory counts, and other metadata on every dispensary in the state of Washington.
 
