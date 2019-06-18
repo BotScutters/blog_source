@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>AI of the Beholder - Bits 'n' Bots</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<style type="text/css">
+
+/*some stuff for output/input prompts*/
+div.cell{border:1px solid transparent;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch}div.cell.selected{border-radius:4px;border:thin #ababab solid}
+div.cell.edit_mode{border-radius:4px;border:thin #008000 solid}
+div.cell{width:100%;padding:5px 5px 5px 0;margin:0;outline:none}
+div.prompt{min-width:11ex;padding:.4em;margin:0;font-family:monospace;text-align:right;line-height:1.21429em}
+@media (max-width:480px){div.prompt{text-align:left}}div.inner_cell{display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch;-webkit-box-flex:1;-moz-box-flex:1;box-flex:1;flex:1}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;line-height:1.21429em}
+div.prompt:empty{padding-top:0;padding-bottom:0}
+div.input{page-break-inside:avoid;display:-webkit-box;-webkit-box-orient:horizontal;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:horizontal;-moz-box-align:stretch;display:box;box-orient:horizontal;box-align:stretch;}
+div.inner_cell{width:90%;}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;}
+div.input_prompt{color:navy;border-top:1px solid transparent;}
+div.output_wrapper{margin-top:5px;position:relative;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.output_scroll{height:24em;width:100%;overflow:auto;border-radius:4px;-webkit-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);-moz-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);}
+div.output_collapsed{margin:0px;padding:0px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.out_prompt_overlay{height:100%;padding:0px 0.4em;position:absolute;border-radius:4px;}
+div.out_prompt_overlay:hover{-webkit-box-shadow:inset 0 0 1px #000000;-moz-box-shadow:inset 0 0 1px #000000;box-shadow:inset 0 0 1px #000000;background:rgba(240, 240, 240, 0.5);}
+div.output_prompt{color:darkred;}
+
+a.anchor-link:link{text-decoration:none;padding:0px 20px;visibility:hidden;}
+h1:hover .anchor-link,h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link,h5:hover .anchor-link,h6:hover .anchor-link{visibility:visible;}
+/* end stuff for output/input prompts*/
+
+
+.highlight-ipynb .hll { background-color: #ffffcc }
+.highlight-ipynb  { background: #f8f8f8; }
+.highlight-ipynb .c { color: #408080; font-style: italic } /* Comment */
+.highlight-ipynb .err { border: 1px solid #FF0000 } /* Error */
+.highlight-ipynb .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight-ipynb .o { color: #666666 } /* Operator */
+.highlight-ipynb .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight-ipynb .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight-ipynb .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight-ipynb .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight-ipynb .gd { color: #A00000 } /* Generic.Deleted */
+.highlight-ipynb .ge { font-style: italic } /* Generic.Emph */
+.highlight-ipynb .gr { color: #FF0000 } /* Generic.Error */
+.highlight-ipynb .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight-ipynb .gi { color: #00A000 } /* Generic.Inserted */
+.highlight-ipynb .go { color: #888888 } /* Generic.Output */
+.highlight-ipynb .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight-ipynb .gs { font-weight: bold } /* Generic.Strong */
+.highlight-ipynb .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight-ipynb .gt { color: #0044DD } /* Generic.Traceback */
+.highlight-ipynb .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight-ipynb .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight-ipynb .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight-ipynb .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight-ipynb .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight-ipynb .kt { color: #B00040 } /* Keyword.Type */
+.highlight-ipynb .m { color: #666666 } /* Literal.Number */
+.highlight-ipynb .s { color: #BA2121 } /* Literal.String */
+.highlight-ipynb .na { color: #7D9029 } /* Name.Attribute */
+.highlight-ipynb .nb { color: #008000 } /* Name.Builtin */
+.highlight-ipynb .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight-ipynb .no { color: #880000 } /* Name.Constant */
+.highlight-ipynb .nd { color: #AA22FF } /* Name.Decorator */
+.highlight-ipynb .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight-ipynb .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight-ipynb .nf { color: #0000FF } /* Name.Function */
+.highlight-ipynb .nl { color: #A0A000 } /* Name.Label */
+.highlight-ipynb .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight-ipynb .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight-ipynb .nv { color: #19177C } /* Name.Variable */
+.highlight-ipynb .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight-ipynb .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight-ipynb .mf { color: #666666 } /* Literal.Number.Float */
+.highlight-ipynb .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight-ipynb .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight-ipynb .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight-ipynb .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight-ipynb .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight-ipynb .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight-ipynb .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight-ipynb .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight-ipynb .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight-ipynb .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight-ipynb .sx { color: #008000 } /* Literal.String.Other */
+.highlight-ipynb .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight-ipynb .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight-ipynb .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight-ipynb .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight-ipynb .vc { color: #19177C } /* Name.Variable.Class */
+.highlight-ipynb .vg { color: #19177C } /* Name.Variable.Global */
+.highlight-ipynb .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight-ipynb .il { color: #666666 } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+<script type="text/javascript">
+init_mathjax = function() {
+    if (window.MathJax) {
+        // MathJax loaded
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+            },
+            displayAlign: 'left', // Change this to 'center' to center equations.
+            "HTML-CSS": {
+                styles: {'.MathJax_Display': {"margin": 0}}
+            }
+        });
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    }
+}
+init_mathjax();
+</script>
+
+<link rel="canonical" href="/articles/2019/06/07/AI-of-the-Beholder/">
+
+        <meta name="author" content="Scott Butters" />
+        <meta name="keywords" content="Python,Data Science,Deep Learning,CNN,Xception,Image Classification,AI,The Singularity" />
+        <meta name="description" content="We hear a lot nowadays about the many superpowers of AI, but we don&#39;t hear much about? Its highly refined aesthetic sensibilities. Well, that&#39;s what I&#39;m here to change! I trained a convolutional neural net to look through thousands of photos taken from on top of the space needle and learn which ones are junk (as a baseline), and even to highlight the most beautiful of the bunch! But while the concept may be a bit of pet-project-floof, it&#39;s not without use case: think first-pass filter on a photographer&#39;s raw photos; think auto-curated album from your snap-happy vacation. Read on for more!" />
+
+        <meta property="og:site_name" content="Bits 'n' Bots" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="AI of the Beholder"/>
+        <meta property="og:url" content="/articles/2019/06/07/AI-of-the-Beholder/"/>
+        <meta property="og:description" content="We hear a lot nowadays about the many superpowers of AI, but we don&#39;t hear much about? Its highly refined aesthetic sensibilities. Well, that&#39;s what I&#39;m here to change! I trained a convolutional neural net to look through thousands of photos taken from on top of the space needle and learn which ones are junk (as a baseline), and even to highlight the most beautiful of the bunch! But while the concept may be a bit of pet-project-floof, it&#39;s not without use case: think first-pass filter on a photographer&#39;s raw photos; think auto-curated album from your snap-happy vacation. Read on for more!"/>
+        <meta property="article:published_time" content="2019-06-07" />
+            <meta property="article:section" content="blog" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:tag" content="Data Science" />
+            <meta property="article:tag" content="Deep Learning" />
+            <meta property="article:tag" content="CNN" />
+            <meta property="article:tag" content="Xception" />
+            <meta property="article:tag" content="Image Classification" />
+            <meta property="article:tag" content="AI" />
+            <meta property="article:tag" content="The Singularity" />
+            <meta property="article:author" content="Scott Butters" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.spacelab.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Bits 'n' Bots            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about-me/">
+                             About Me
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/blog">Blog</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+<!-- Content Container -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/articles/2019/06/07/AI-of-the-Beholder/"
+                       rel="bookmark"
+                       title="Permalink to AI of the Beholder">
+                        AI of the Beholder
+                    </a>
+                </h1>
+                <p><small>
+                    <span class="published">
+                        <time datetime="2019-06-07T14:00:00-07:00"> Fri 07 June 2019</time>
+                    </span>
+                    ~ 9 min read
+                </small></p>
+            </header>
+
+            <div class="entry-content">
+                <p>We hear a lot nowadays about the many superpowers of AI, but we don't hear much about? Its highly refined aesthetic sensibilities. Well, that's what I'm here to change! I trained a convolutional neural net to look through thousands of photos taken from on top of the space needle and learn which ones are junk (as a baseline), and even to highlight the most beautiful of the bunch! But while the concept may be a bit of pet-project-floof, it's not without use case: think first-pass filter on a photographer's raw photos; think auto-curated album from your snap-happy vacation. </p>
+<figure>
+  <img src="/img/beholder5.jpg" alt="ai-of-the-beholder" style="width:100%">
+  <figcaption>You're so pretty, Seattle.</figcaption>
+</figure>
+
+<h1>Abstract</h1>
+<p>For this project, I've trained a convolutional neural net to look through a gallery of images and then assign scores to each image according to it's quality, allowing a user to apply the algorithm as a first-pass filter to reduce the size of a gallery to review. As an added benefit, the scores can also be used to highlight the best amongst the images. The dataset used for this project is a collection of panoramic images taken of the Seattle skyline by a camera on top the Space Needle. I implemented the model in Keras using Xception architecture with transfer learning, instantiated with weights pre-trained on ImageNet. The convolutional base is reduced by a 2D global average pooling layer followed by a dropout layer and a fully connected layer reducing down to a single neuron with linear activation for the final prediction of an image's score. All but the top 4 blocks of the convolutional base were frozen during training. The top performing model used the following parameters:</p>
+<ul>
+<li>Dropout rate: 0.6</li>
+<li>Optimizer: stochastic gradient descent, learning rate = 0.0001, momentum = 0.9, clip value = 0.5</li>
+<li>Loss function: mean squared error</li>
+</ul>
+<h1>Tools</h1>
+<p><strong>General</strong></p>
+<ul>
+<li>Python</li>
+<li>Numpy </li>
+<li>Pandas</li>
+<li>Jupyter Notebook</li>
+</ul>
+<p><strong>Cloud</strong></p>
+<ul>
+<li>AWS S3</li>
+<li>AWS EC2</li>
+</ul>
+<p><strong>Deep Learning</strong></p>
+<ul>
+<li>Keras</li>
+<li>TensorFlow</li>
+<li>TensorBoard</li>
+<li>Sci-kit Learn</li>
+</ul>
+<p><strong>Visualization</strong></p>
+<ul>
+<li>Matplotlib</li>
+<li>Seaborn</li>
+<li>Sci-kit Learn</li>
+<li>TensorBoard</li>
+<li>PIL</li>
+</ul>
+<h1>Data Source</h1>
+<p>My data source for this project was the panoramic photos taken by the camera on top of the space needle. Check out their gallery <a href="https://www.spaceneedle.com/webcam/">here</a>. The camera has been taking one image for every ~10 minutes of daylight since the beginning of 2015, amounting to approximately 130,000 images now. After some sleuthing through the page's source code, I found links to the site's <a href="https://spaceneedledev.com/panocam/assets/">filesystem</a>, which they've left exposed. For each panorama photo, there's a folder has 17 high resolution slices that make up the panorama, as well as a low resolution (237x1820) thumbnail image with all the slices stitched together. Gold mine! I spun up an EC2 instance and wrote a script to crawl their entire file tree and duplicate all of the thumbnails (about 14 GB) into an AWS S3 bucket. Good to go!</p>
+<h1>Data Preparation</h1>
+<p>We can't very well have our model running around looking at photos without a goal, so next I needed to get some labels on my data. I started out treating this as a classification problem, with the goal of specifically labeling a photo as either beautiful or not. This is of course playing with devil, because what kind of fuzzy boundary around a category is that? How could that possibly be objective?What even <em>is</em> beauty? Oh, these questions tumbled around in my brain and I reveled in the challenge of how best to approach it. As for actually getting these scores, I considered my options:</p>
+<ul>
+<li><strong>Mechanical Turk</strong> - I <em>could</em> devise an easy-to-follow scoring system and sick the crowd on it. So long as my instructions were clear and I had good accountability measures in place to make sure my turks were well-behaved and not turkeys or headless Selenium drivers, this would likely yield robust results. On the flip side, this will probably take me several hours to get set up, and costs money (and I'm not being paid for this).</li>
+<li><strong>Heroku App</strong> - I could throw together a quick hot-or-not style app and send it to all my friends. Really this is the same solution as mechanical turk, but a bit closer to free. And perhaps it would have been the better option? But it's not what happened. Instead I opted for the ol'</li>
+<li><strong>Do it myself</strong> - I didn't want to spend the money, and I had doubts about whether or not I'd be able to get the necessary scale of responses I wanted by leaning on my social network—how much time would any of them really voluntarily devote to scoring photo after photo of the Seattle skyline? And I didn't really want to make that ask. So I bit the bullet and did it myself.</li>
+</ul>
+<p>I wrote myself a scoring program in Jupyter notebook that I could use to quickly flip through and score photos. I thought about all the potential strategies. Implement a manual version of insertion sort? Treat it like a bracket and do lots of A vs B comparisons? These seemed like cool strategies, but also like the time complexity would kill me. I wanted a way to generate 2000+ scores in less than 10 hours of work with informative gradations and as high a degree of consistency as practical. That's…kind of a big ask. So here's how I did it.</p>
+<h2>Data Labeling</h2>
+<p>I randomly drew 4 images at a time from my S3 bucket, and then was faced with a prompt to enter the indices for the images I want to advance to the next round. It's like a tournament bracket…but because I'm a smart human that doesn't need strict rules, there's no constraint on how many choices I make in a round. This allowed me to avoid that obstacle of "what if they're both really similar!" Rather than always having to advance and discard some number, I instead kept track of my overall acceptance rate and tried to roughly peg that at a particular threshold. Starting out, I aimed for a 50/50 split, since as a baseline I wanted at least verify the model could work on a balanced dataset. The difference between these might be something like this:</p>
+<figure>
+  <img src="/img/0beauty.jpg" alt="uggo" style="width:100%">
+  <figcaption>Beauty: 0.</figcaption>
+</figure>
+
+<figure>
+  <img src="/img/1beauty.jpg" alt="yeah-you-pretty" style="width:100%">
+  <figcaption>Beauty: 1.</figcaption>
+</figure>
+
+<p>Once I got a model predicting at &gt; 90% accuracy on my split (more on that later), I decided to up the ante. I fed my positive class back into my labeling program for a second round. This time I went more aggressive and tried to select all the way up to the 95th percentile of photos. This tended to be a tight enough threshold that most of the images were low in defects and also had something <em>interesting</em> about them, be it good lighting, dynamic clouds, a colorful sunset, absolute clarity...</p>
+<figure>
+  <img src="/img/2beauty.jpg" alt="lookin-good" style="width:100%">
+  <figcaption>Beauty: 2.</figcaption>
+</figure>
+
+<p>But that wasn't enough for me. I narrowed down one tier further to identify my top 2% of photos. These were the real upper crust. Still not always devoid of flaws, but generally in quite good shape and some fo the most compelling scenes.</p>
+<figure>
+  <img src="/img/3beauty.jpg" alt="hot-stuff" style="width:100%">
+  <figcaption>Beauty: 3.</figcaption>
+</figure>
+
+<p>At this point, I knew I'd be running into a severe class imbalance issue without substantially increasing the number of photos I sifted through, so I left it here for the time being.</p>
+<h2>Data Labeling Round 2!</h2>
+<p>I was right, that class imbalance was an issue! Even after labelling over 3200 photos, a 64/16/20 train/crossval/test split meant that trying to identify the top 2% of images would give me a meager 11 positive class photos in my validation set, even with tools like image augmentation and oversampling at my disposal…I'm sorry, no, that's just not going to be enough. </p>
+<h1>Modeling</h1>
+<p>For the modeling, I decided to implement a convolutional neural network using Keras and Tensorflow. After surveying architectures implemented in Keras that also have pre-trained weights, I opted to use the Xception architecture based on it's combination of high reported accuracy and relatively low size and parameter counts as compared to the new old guard architectures like VGG 16/19. </p>
+<p>I chopped off the model at the latent vector output by the convolutional base and tacked my own predictor onto the end. I experimented with several potential arrangements, but ended up settling on prediction setup like the following:</p>
+<ul>
+<li>2D global average pooling layer</li>
+<li>Dropout layer (rate = 0.6)</li>
+<li>Fully connected layer</li>
+<li>Output neuron(s)</li>
+</ul>
+<p>As mentioned before, I initially started out treating this as a classification problem, and followed the advice of the Xception authors by setting up the output as two neurons with softmax activation. This allowed me to easily easily interpret my results according to whether or not a photo I'd classified as being categorically "beautiful" was also recognized as such by the model. To measure the performance, I implemented an F2 metric that would only be computed once per epoch (F2 because I wanted to place higher emphasis on recall than precision, as I'd prefer to do a little bit of extra sorting if it means I don't lose miss out on a real gem). I experimented with several optimizers and loss functions, but ultimately my best parameters were as follows:</p>
+<ul>
+<li>Stochastic gradient descent: learning rate = 0.0001, momentum = 0.9, clip_value = 0.5</li>
+<li>Loss function: categorical cross entropy</li>
+</ul>
+<p>Ultimately, the best performance I got on this model while targeting the top 5% of photos was an F2 score of 0.27. Which was decent, but the more I fished around in the probability estimates and tried to determine what was hindering performance, the more I really started getting the itch that my problem had somehow transformed from a classification problem to a regression problem, albeit a very low resolution regression problem. Based on the mode by which I'd scored the data, I now had a 4-class dataset, but these classes were <em>ordinal</em>. And not just that, but also their distances were actually somewhat meaningful. And my classification model was totally disregarding some of that information, and I didn't like that. I could treat it as a multi-label classification problem, but that doesn't account for the ordering.</p>
+<p>Pivot!</p>
+<p>So now I was building a regression model. But as it turns out, there's a simple way to do this that requires barely any change at all (to the model). To convert my prediction block to a regression, I changed the output from two neurons with softmax activation to one output with linear activation. And that's it! Well, mostly. Other things I changed:</p>
+<ul>
+<li>Optimizer: rmsprop</li>
+<li>Loss function: mean_squared_error</li>
+</ul>
+<p>The only other changes that were required were modifications to the pipeline feeding the data into the model, such as transforming my labels into more useful target scores and adjusting the data generators to reference the correct variable.</p>
+<h1>Results</h1>
+<p>Overall, both models did a pretty good job of filtering out the bad photos. But how do we actually compare the performance of a regression model to a classification model? For this context, I decided to look at it through lens of time-savings. Supposing my goal is to have my model filter the dataset down to the smallest dataset it can while still maintaining the top 5% of photos, what percent gallery reduction can I achieve? </p>
+<ul>
+<li>Classification: 42% reduction in gallery size</li>
+<li>Regression: 24% reduction in gallery size</li>
+</ul>
+<p>Alas, despite all my hopes and dreams for the regression model, the classifier actually won out!</p>
+<h1>Conclusion</h1>
+<p>In it's current state, the project has made significant progress towards demonstrating the potential for an intelligent neural network to be able to learn about our aesthetic sensibilities and filter the best photos from a chaotic collection. That said, there's ample improvements that can be made. The labeling and scoring in this prototype is still quite crude, and I'd love to increase the fidelity by crowdsourcing the scores with a more defined metric and methodology. The dataset of space needle images is fun, but quite specific. For this model to be truly useful to a photographer, I'd want to train a model on images more akin to the types of settingts they shoot in, and perhaps even add functionality to fine tune the model as a user applies the model to their data, learning the particulars of their taste and style. Additionally, there are many sorts of features that could be built on top of this architecture, such as capturing the model's latent vectors prior to classification and using them to identify images most similar to a selected picture. Always more to do!</p>
+            </div>
+            
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="https://github.com/BotScutters"><i class="fa fa-github-square fa-lg"></i> Github</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/scott-butters/"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="https://www.thisismetis.com" target="_blank">Metis</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+
+<!-- Sidebar/Tag Cloud -->
+<li class="list-group-item">
+  <a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+  <ul class="list-group " id="tags">
+    <li class="list-group-item tag-1">
+      <a href="/tag/python">Python</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/data-science">Data Science</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/ai">AI</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/the-singularity">The Singularity</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/robots">Robots</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/nlp">NLP</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/svd">SVD</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/lsa">LSA</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/cocktails">Cocktails</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/recommender">Recommender</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/flask">Flask</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/app">App</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/web-scraping">Web Scraping</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/leafly">Leafly</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/marijuana">Marijuana</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Tag Cloud -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2019 Scott Butters
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+</body>
+</html>
