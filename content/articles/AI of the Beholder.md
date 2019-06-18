@@ -134,7 +134,30 @@ Overall, both models did a pretty good job of filtering out the bad photos. But 
 * Classification: 42% reduction in gallery size
 * Regression: 24% reduction in gallery size
 
-Alas, despite all my hopes and dreams for the regression model, the classifier actually won out!
+Alas, despite all my hopes and dreams for the regression model, the classifier actually won out! Interpreting these results, this effectively means that if previously an editor were to spend 10 hours sifting through a gallery to select the images, they could now apply this model as a first pass filter and save themselves 4 hours of work!
+
+Of course, what's the point of all this work if we don't actually apply the model to the broader dataset! Let's have a look at some of the images that scored the highest when I finally applied the model to the broader 130,000+ image dataset.
+
+<figure>
+  <img src="{static}/img/beholder1.jpg" alt="sunset" style="width:100%">
+  <figcaption>❤️ sunsets</figcaption>
+</figure>
+
+<figure>
+  <img src="{static}/img/beholder2.jpg" alt="paint" style="width:100%">
+  <figcaption>Painted skies</figcaption>
+</figure>
+
+<figure>
+  <img src="{static}/img/beholder3.jpg" alt="cloud-dynamix" style="width:100%">
+  <figcaption>Dynamic clouds</figcaption>
+</figure>
+
+<figure>
+  <img src="{static}/img/beholder4.jpg" alt="dramatic-vista" style="width:100%">
+  <figcaption>Drama!</figcaption>
+</figure>
+
 
 # Conclusion
 
